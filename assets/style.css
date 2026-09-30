@@ -226,7 +226,9 @@ h1 em, h2 em, h3 em {
   position: absolute; inset: 0;
   background: linear-gradient(90deg, #eff6f4 0%, rgba(239,246,244,.93) 27%, rgba(239,246,244,.61) 46%, rgba(239,246,244,0) 72%);
 }
-.hero-content { position: relative; padding: 72px 24px 32px; max-width: 720px; }
+.hero-content { position: relative; max-width: 1280px; margin: 0 auto; padding: 72px 40px 32px; }
+.hero-content > * { max-width: 720px; }
+.hero-content .hero-proof { max-width: none; width: fit-content; }
 .hero-in { opacity: 0; transform: translateY(18px); animation: hero-in-up .7s cubic-bezier(.2,.7,.3,1) forwards; animation-delay: var(--d, 0s); }
 @keyframes hero-in-up { to { opacity: 1; transform: translateY(0); } }
 .hero .eyebrow { color: var(--teal); }
@@ -326,6 +328,7 @@ h1 em, h2 em, h3 em {
   .caminhos { padding-bottom: 64px; }
   .two-col { gap: 32px; }
   .container { padding: 0 20px; }
+  .hero-content { padding: 38px 22px 26px; }
   h2 { font-size: clamp(1.7rem, 6.5vw, 2.1rem); }
 }
 
