@@ -213,24 +213,25 @@ h1 em, h2 em, h3 em {
 /* Hero */
 .hero { position: relative; color: var(--dark); overflow: hidden; background: #edf4f4; }
 .hero-bg {
-  position: absolute; inset: -10px; width: calc(100% + 20px); height: calc(100% + 20px); object-fit: cover;
-  animation: hero-kenburns 22s ease-in-out infinite alternate;
+  position: absolute; inset: -6px; width: calc(100% + 12px); height: calc(100% + 12px); object-fit: cover;
+  object-position: 50% 55%;
+  animation: hero-kenburns 26s ease-in-out infinite alternate;
   will-change: transform;
 }
 @keyframes hero-kenburns {
   0% { transform: scale(1) translate3d(0,0,0); }
-  100% { transform: scale(1.1) translate3d(-1%, -1%, 0); }
+  100% { transform: scale(1.035) translate3d(-0.5%, -0.5%, 0); }
 }
 .hero-wash {
   position: absolute; inset: 0;
   background: linear-gradient(90deg, #eff6f4 0%, rgba(239,246,244,.93) 27%, rgba(239,246,244,.61) 46%, rgba(239,246,244,0) 72%);
 }
-.hero-content { position: relative; padding: 72px 24px 64px; max-width: 720px; }
+.hero-content { position: relative; padding: 72px 24px 32px; max-width: 720px; }
 .hero-in { opacity: 0; transform: translateY(18px); animation: hero-in-up .7s cubic-bezier(.2,.7,.3,1) forwards; animation-delay: var(--d, 0s); }
 @keyframes hero-in-up { to { opacity: 1; transform: translateY(0); } }
 .hero .eyebrow { color: var(--teal); }
-.hero h1 { font-size: clamp(2.5rem, 6.5vw, 3.8rem); color: var(--dark); }
-.hero .lead { color: var(--muted); max-width: 46ch; margin-bottom: 1.75rem; font-size: 1.15rem; }
+.hero h1 { font-size: clamp(2.5rem, 6.5vw, 3.8rem); color: var(--dark); line-height: 1.09; margin-bottom: .4em; }
+.hero .lead { color: var(--muted); max-width: 46ch; margin-bottom: 1.75rem; font-size: 1rem; }
 
 .hero-proof {
   display: flex; flex-wrap: wrap; gap: 26px;
