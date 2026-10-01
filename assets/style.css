@@ -151,6 +151,14 @@ h1 em, h2 em, h3 em {
 .topbar-proof { color: #fff; font-weight: 600; }
 .topbar-proof .lucide-icon { color: var(--gold); }
 
+.topbar-login {
+  display: none; align-items: center; gap: 6px;
+  font-size: .9rem; font-weight: 600; color: #eef4f4;
+  white-space: nowrap; transition: color .2s ease;
+}
+.topbar-login:hover { color: var(--gold); }
+@media (min-width: 900px) { .topbar-login { display: flex; } }
+
 .menu-toggle {
   display: inline-flex;
   background: transparent;
