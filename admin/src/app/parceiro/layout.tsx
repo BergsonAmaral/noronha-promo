@@ -5,6 +5,7 @@ import type { Profile, Parceiro } from "@/lib/supabase/types";
 import { HOME_BY_ROLE } from "@/lib/role-routing";
 import { signOut } from "@/app/login/actions";
 import { LogOut, ScanLine } from "lucide-react";
+import { NavTabs } from "./nav-tabs";
 
 export default async function ParceiroLayout({
   children,
@@ -59,6 +60,7 @@ export default async function ParceiroLayout({
           </button>
         </form>
       </header>
+      <NavTabs />
       <main className="flex flex-1 items-start justify-center p-5">
         <div className="w-full max-w-md">{children}</div>
       </main>
