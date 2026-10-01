@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { SolicitacaoParceiro } from "@/lib/supabase/types";
 import { aprovarSolicitacao, rejeitarSolicitacao } from "./actions";
+import { Check, X, Handshake, Mail, Phone } from "lucide-react";
 
 export default async function SolicitacoesPage() {
   const supabase = await createClient();
@@ -12,7 +13,9 @@ export default async function SolicitacoesPage() {
 
   return (
     <div>
-      <h1 className="font-semibold text-2xl text-[#263f40]">Solicitações de parceria</h1>
+      <h1 className="font-head text-2xl font-bold text-[#263f40]">
+        Solicitações de parceria
+      </h1>
       <p className="mt-1 text-sm text-[#5c6e6f]">
         Cadastros feitos no formulário &ldquo;Seja um parceiro&rdquo; do site.
       </p>
@@ -21,33 +24,52 @@ export default async function SolicitacoesPage() {
         {solicitacoes?.map((s) => (
           <div key={s.id} className="rounded-xl border border-[#e7e2d6] bg-white p-5">
             <div className="flex items-start justify-between gap-4">
-              <div>
-                <h3 className="font-semibold text-[#263f40]">{s.nome_negocio}</h3>
-                <p className="mt-1 text-sm text-[#5c6e6f]">
-                  {s.responsavel} · {s.email} · {s.telefone ?? "sem telefone"}
-                </p>
-                {s.categoria_sugerida && (
-                  <p className="mt-1 text-sm text-[#5c6e6f]">
-                    Categoria sugerida: {s.categoria_sugerida}
-                  </p>
-                )}
-                {s.mensagem && (
-                  <p className="mt-2 max-w-2xl text-sm text-[#425c5a]">{s.mensagem}</p>
-                )}
-                <span className="mt-2 inline-block rounded-full bg-[#f7f8f8] px-2.5 py-0.5 text-xs font-medium text-[#5c6e6f]">
-                  {s.status}
+              <div className="flex gap-4">
+                <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-[#eef4f2] text-[#48696c]">
+                  <Handshake size={19} strokeWidth={2} />
                 </span>
+                <div>
+                  <h3 className="font-head font-semibold text-[#263f40]">
+                    {s.nome_negocio}
+                  </h3>
+                  <p className="mt-1 text-sm text-[#5c6e6f]">{s.responsavel}</p>
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#5c6e6f]">
+                    <span className="flex items-center gap-1.5">
+                      <Mail size={14} strokeWidth={2} />
+                      {s.email}
+                    </span>
+                    {s.telefone && (
+                      <span className="flex items-center gap-1.5">
+                        <Phone size={14} strokeWidth={2} />
+                        {s.telefone}
+                      </span>
+                    )}
+                  </div>
+                  {s.categoria_sugerida && (
+                    <p className="mt-1 text-sm text-[#5c6e6f]">
+                      Categoria sugerida: {s.categoria_sugerida}
+                    </p>
+                  )}
+                  {s.mensagem && (
+                    <p className="mt-2 max-w-2xl text-sm text-[#425c5a]">{s.mensagem}</p>
+                  )}
+                  <span className="mt-2 inline-block rounded-full bg-[#f7f8f8] px-2.5 py-0.5 text-xs font-medium text-[#5c6e6f]">
+                    {s.status}
+                  </span>
+                </div>
               </div>
 
               {s.status === "pendente" && (
                 <div className="flex flex-shrink-0 gap-2">
                   <form action={aprovarSolicitacao.bind(null, s)}>
-                    <button className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700">
+                    <button className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700">
+                      <Check size={14} strokeWidth={2.5} />
                       Aprovar e criar parceiro
                     </button>
                   </form>
                   <form action={rejeitarSolicitacao.bind(null, s.id)}>
-                    <button className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50">
+                    <button className="flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50">
+                      <X size={14} strokeWidth={2.5} />
                       Rejeitar
                     </button>
                   </form>

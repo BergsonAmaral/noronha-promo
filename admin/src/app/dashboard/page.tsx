@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { Tags, Store, Clock, Ticket, Users, Handshake, type LucideIcon } from "lucide-react";
 
 async function getCounts() {
   const supabase = await createClient();
@@ -32,28 +33,41 @@ async function getCounts() {
 export default async function DashboardPage() {
   const counts = await getCounts();
 
-  const cards = [
-    { label: "Categorias", value: counts.categorias, href: "/dashboard/categorias" },
-    { label: "Parceiros", value: counts.parceiros, href: "/dashboard/parceiros" },
+  const cards: {
+    label: string;
+    value: number;
+    href: string;
+    icon: LucideIcon;
+    highlight?: boolean;
+  }[] = [
+    { label: "Categorias", value: counts.categorias, href: "/dashboard/categorias", icon: Tags },
+    { label: "Parceiros", value: counts.parceiros, href: "/dashboard/parceiros", icon: Store },
     {
       label: "Parceiros pendentes",
       value: counts.parceirosPendentes,
       href: "/dashboard/parceiros?status=pendente",
+      icon: Clock,
       highlight: counts.parceirosPendentes > 0,
     },
-    { label: "Benefícios ativos", value: counts.beneficios, href: "/dashboard/beneficios" },
-    { label: "Leads cadastrados", value: counts.leads, href: "/dashboard/leads" },
+    {
+      label: "Benefícios ativos",
+      value: counts.beneficios,
+      href: "/dashboard/beneficios",
+      icon: Ticket,
+    },
+    { label: "Leads cadastrados", value: counts.leads, href: "/dashboard/leads", icon: Users },
     {
       label: "Solicitações de parceria",
       value: counts.solicitacoes,
       href: "/dashboard/solicitacoes",
+      icon: Handshake,
       highlight: counts.solicitacoes > 0,
     },
   ];
 
   return (
     <div>
-      <h1 className="font-semibold text-2xl text-[#263f40]">Visão geral</h1>
+      <h1 className="font-head text-2xl font-bold text-[#263f40]">Visão geral</h1>
       <p className="mt-1 text-sm text-[#5c6e6f]">
         Resumo do que está acontecendo no clube agora.
       </p>
@@ -63,14 +77,27 @@ export default async function DashboardPage() {
           <a
             key={card.label}
             href={card.href}
-            className={`rounded-xl border p-5 transition hover:shadow-md ${
+            className={`group flex items-start justify-between rounded-xl border p-5 transition hover:-translate-y-0.5 hover:shadow-md ${
               card.highlight
                 ? "border-[#df9c28]/40 bg-[#df9c28]/5"
                 : "border-[#e7e2d6] bg-white"
             }`}
           >
-            <p className="text-sm text-[#5c6e6f]">{card.label}</p>
-            <p className="mt-2 font-semibold text-3xl text-[#263f40]">{card.value}</p>
+            <div>
+              <p className="text-sm text-[#5c6e6f]">{card.label}</p>
+              <p className="mt-2 font-head text-3xl font-bold text-[#263f40]">
+                {card.value}
+              </p>
+            </div>
+            <span
+              className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg ${
+                card.highlight
+                  ? "bg-[#df9c28]/15 text-[#c78716]"
+                  : "bg-[#eef4f2] text-[#48696c]"
+              }`}
+            >
+              <card.icon size={20} strokeWidth={2} />
+            </span>
           </a>
         ))}
       </div>

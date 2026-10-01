@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Lead } from "@/lib/supabase/types";
+import { Download, Users } from "lucide-react";
 
 export default async function LeadsPage() {
   const supabase = await createClient();
@@ -13,7 +14,7 @@ export default async function LeadsPage() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-semibold text-2xl text-[#263f40]">Leads</h1>
+          <h1 className="font-head text-2xl font-bold text-[#263f40]">Leads</h1>
           <p className="mt-1 text-sm text-[#5c6e6f]">
             Cadastros feitos no formulário &ldquo;Entre na lista do clube&rdquo; do site.
           </p>
@@ -26,8 +27,9 @@ export default async function LeadsPage() {
                 .join("\n")
           )}`}
           download="leads-noronha-promo.csv"
-          className="rounded-lg border border-[#e7e2d6] px-4 py-2 text-sm font-medium text-[#425c5a] hover:bg-[#f7f8f8]"
+          className="flex items-center gap-2 rounded-lg border border-[#e7e2d6] px-4 py-2 text-sm font-medium text-[#425c5a] hover:bg-[#f7f8f8]"
         >
+          <Download size={16} strokeWidth={2} />
           Exportar CSV
         </a>
       </div>
@@ -44,7 +46,14 @@ export default async function LeadsPage() {
           <tbody className="divide-y divide-[#e7e2d6]">
             {leads?.map((lead) => (
               <tr key={lead.id}>
-                <td className="px-4 py-3 font-medium text-[#263f40]">{lead.nome}</td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2.5 font-medium text-[#263f40]">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#eef4f2] text-[#48696c]">
+                      <Users size={13} strokeWidth={2} />
+                    </span>
+                    {lead.nome}
+                  </div>
+                </td>
                 <td className="px-4 py-3 text-[#5c6e6f]">{lead.email}</td>
                 <td className="px-4 py-3 text-[#5c6e6f]">
                   {new Date(lead.created_at).toLocaleString("pt-BR")}
