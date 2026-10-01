@@ -31,9 +31,20 @@ export default async function ParceiroLayout({
 
   const { data: negocio } = await supabase
     .from("parceiros")
-    .select("nome_negocio")
+    .select("id, nome_negocio")
     .eq("user_id", user.id)
-    .maybeSingle<Pick<Parceiro, "nome_negocio">>();
+    .maybeSingle<Pick<Parceiro, "id" | "nome_negocio">>();
+
+  let mensagensNaoLidas = 0;
+  if (negocio) {
+    const { count } = await supabase
+      .from("mensagens")
+      .select("id", { count: "exact", head: true })
+      .eq("parceiro_id", negocio.id)
+      .eq("remetente_role", "admin")
+      .eq("lida", false);
+    mensagensNaoLidas = count ?? 0;
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f7f8f8]">
@@ -60,7 +71,7 @@ export default async function ParceiroLayout({
           </button>
         </form>
       </header>
-      <NavTabs />
+      <NavTabs mensagensNaoLidas={mensagensNaoLidas} />
       <main className="flex flex-1 items-start justify-center p-5">
         <div className="w-full max-w-md">{children}</div>
       </main>

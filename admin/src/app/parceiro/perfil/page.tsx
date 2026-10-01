@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import type { Avaliacao, Categoria, Parceiro, Profile } from "@/lib/supabase/types";
 import { PerfilForm } from "./perfil-form";
+import { AlterarSenhaForm } from "./alterar-senha-form";
 import { AvaliacoesResumo } from "@/components/avaliacoes-resumo";
 
 export default async function PerfilParceiroPage() {
@@ -43,6 +44,8 @@ export default async function PerfilParceiroPage() {
         </p>
         <PerfilForm parceiro={parceiro} categorias={categorias ?? []} />
       </div>
+
+      <AlterarSenhaForm />
 
       <AvaliacoesResumo avaliacoes={avaliacoes ?? []} />
     </div>
