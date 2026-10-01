@@ -1,5 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { HOME_BY_ROLE } from "@/lib/role-routing";
+import type { Profile } from "@/lib/supabase/types";
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -37,8 +39,14 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && isLoginPage) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single<Pick<Profile, "role">>();
+
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    url.pathname = HOME_BY_ROLE[profile?.role ?? "cliente"];
     return NextResponse.redirect(url);
   }
 

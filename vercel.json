@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/portal",
+      "destination": "https://admin-rosy-omega-014q1k7tc7.vercel.app/portal"
+    },
+    {
+      "source": "/portal/:path*",
+      "destination": "https://admin-rosy-omega-014q1k7tc7.vercel.app/portal/:path*"
+    }
+  ]
+}

@@ -2,19 +2,27 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import type { Profile } from "@/lib/supabase/types";
+import { HOME_BY_ROLE } from "@/lib/role-routing";
 
 export async function signIn(formData: FormData) {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-  if (error) {
-    redirect(`/login?error=${encodeURIComponent(error.message)}`);
+  if (error || !data.user) {
+    redirect(`/login?error=${encodeURIComponent(error?.message ?? "Erro ao entrar")}`);
   }
 
-  redirect("/dashboard");
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", data.user.id)
+    .single<Pick<Profile, "role">>();
+
+  redirect(HOME_BY_ROLE[profile?.role ?? "cliente"]);
 }
 
 export async function signOut() {
