@@ -4,7 +4,8 @@ import Image from "next/image";
 import type { Profile } from "@/lib/supabase/types";
 import { HOME_BY_ROLE } from "@/lib/role-routing";
 import { signOut } from "@/app/login/actions";
-import { LogOut, Ticket } from "lucide-react";
+import { LogOut, Sparkles } from "lucide-react";
+import { NavTabs } from "./nav-tabs";
 
 export default async function ClienteLayout({
   children,
@@ -38,8 +39,8 @@ export default async function ClienteLayout({
               Olá, {profile.nome.split(" ")[0]}
             </p>
             <p className="flex items-center gap-1 text-[10px] tracking-wider text-[#9db1b1] uppercase">
-              <Ticket size={11} strokeWidth={2} />
-              Meus cupons
+              <Sparkles size={11} strokeWidth={2} />
+              Clube Noronha Promo
             </p>
           </div>
         </div>
@@ -53,6 +54,7 @@ export default async function ClienteLayout({
           </button>
         </form>
       </header>
+      <NavTabs />
       <main className="mx-auto max-w-md p-5">{children}</main>
     </div>
   );
