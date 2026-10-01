@@ -12,7 +12,6 @@ const NAV = [
   { href: "/dashboard/parceiros", label: "Parceiros", icon: "Store" },
   { href: "/dashboard/beneficios", label: "Benefícios", icon: "Ticket" },
   { href: "/dashboard/leads", label: "Leads", icon: "Users" },
-  { href: "/dashboard/solicitacoes", label: "Solicitações de parceria", icon: "Handshake" },
 ] as const;
 
 export default async function DashboardLayout({

@@ -1,24 +1,19 @@
 import { createClient } from "@/lib/supabase/server";
-import { Tags, Store, Clock, Ticket, Users, Handshake, type LucideIcon } from "lucide-react";
+import { Tags, Store, Clock, Ticket, Users, type LucideIcon } from "lucide-react";
 
 async function getCounts() {
   const supabase = await createClient();
 
-  const [categorias, parceiros, parceirosPendentes, beneficios, leads, solicitacoes] =
-    await Promise.all([
-      supabase.from("categorias").select("id", { count: "exact", head: true }),
-      supabase.from("parceiros").select("id", { count: "exact", head: true }),
-      supabase
-        .from("parceiros")
-        .select("id", { count: "exact", head: true })
-        .eq("status", "pendente"),
-      supabase.from("beneficios").select("id", { count: "exact", head: true }),
-      supabase.from("leads").select("id", { count: "exact", head: true }),
-      supabase
-        .from("solicitacoes_parceiro")
-        .select("id", { count: "exact", head: true })
-        .eq("status", "pendente"),
-    ]);
+  const [categorias, parceiros, parceirosPendentes, beneficios, leads] = await Promise.all([
+    supabase.from("categorias").select("id", { count: "exact", head: true }),
+    supabase.from("parceiros").select("id", { count: "exact", head: true }),
+    supabase
+      .from("parceiros")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pendente"),
+    supabase.from("beneficios").select("id", { count: "exact", head: true }),
+    supabase.from("leads").select("id", { count: "exact", head: true }),
+  ]);
 
   return {
     categorias: categorias.count ?? 0,
@@ -26,7 +21,6 @@ async function getCounts() {
     parceirosPendentes: parceirosPendentes.count ?? 0,
     beneficios: beneficios.count ?? 0,
     leads: leads.count ?? 0,
-    solicitacoes: solicitacoes.count ?? 0,
   };
 }
 
@@ -50,19 +44,12 @@ export default async function DashboardPage() {
       highlight: counts.parceirosPendentes > 0,
     },
     {
-      label: "Benefícios ativos",
+      label: "Benefícios cadastrados",
       value: counts.beneficios,
       href: "/dashboard/beneficios",
       icon: Ticket,
     },
     { label: "Leads cadastrados", value: counts.leads, href: "/dashboard/leads", icon: Users },
-    {
-      label: "Solicitações de parceria",
-      value: counts.solicitacoes,
-      href: "/dashboard/solicitacoes",
-      icon: Handshake,
-      highlight: counts.solicitacoes > 0,
-    },
   ];
 
   return (

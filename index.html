@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@500;600;700;800&family=Fraunces:ital,wght@1,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 <a href="#conteudo" class="skip-link">Pular para o conteúdo</a>
@@ -354,9 +355,50 @@
       <span class="eyebrow center">Para quem faz Noronha acontecer</span>
       <h2>Seu negócio na próxima<br /><em>descoberta de alguém.</em></h2>
       <p class="lead">Sem adesão, mensalidade ou comissão sobre vendas.<br />Você define o benefício. A gente conecta.</p>
-      <a href="#contato" class="btn btn-teal">Seja um parceiro
+      <a href="#form-parceiro" class="btn btn-teal">Seja um parceiro
         <i data-lucide="arrow-up-right" data-size="16"></i>
       </a>
+    </div>
+
+    <div class="container parceiro-form-wrap" id="form-parceiro">
+      <form class="parceiro-form-card" id="form-seja-parceiro" novalidate>
+        <h3>Cadastre seu negócio</h3>
+        <p>Vamos analisar e entrar em contato em breve.</p>
+
+        <label for="p-nome-negocio">Nome do negócio</label>
+        <input id="p-nome-negocio" name="nome_negocio" type="text" placeholder="Ex: Pousada Mar Azul" required />
+
+        <label for="p-categoria">Categoria</label>
+        <select id="p-categoria" name="categoria">
+          <option value="">Selecione uma categoria</option>
+          <option value="hospedagem">Hospedagem</option>
+          <option value="gastronomia">Gastronomia</option>
+          <option value="passeios">Passeios</option>
+          <option value="mergulho">Mergulho</option>
+          <option value="mobilidade">Carros e buggys</option>
+          <option value="equipamentos">Equipamentos</option>
+          <option value="transfer">Transfers</option>
+          <option value="trilhas">Trilhas</option>
+          <option value="surf">Surf</option>
+          <option value="compras">Lojas locais</option>
+          <option value="fotografia">Fotografia</option>
+          <option value="bem-estar">Bem-estar</option>
+          <option value="entretenimento">Entretenimento</option>
+          <option value="romantico">A dois</option>
+        </select>
+
+        <label for="p-email">E-mail</label>
+        <input id="p-email" name="email" type="email" placeholder="voce@seunegocio.com.br" required />
+
+        <label for="p-telefone">Telefone / WhatsApp</label>
+        <input id="p-telefone" name="telefone" type="tel" placeholder="(81) 99999-9999" />
+
+        <label for="p-mensagem">Conte um pouco do seu negócio</label>
+        <textarea id="p-mensagem" name="mensagem" rows="3" placeholder="O que você oferece e que tipo de benefício pensa em dar aos membros do clube"></textarea>
+
+        <button type="submit" class="btn btn-gold btn-block">Enviar cadastro</button>
+        <p class="form-status" id="form-parceiro-status" role="status" aria-live="polite"></p>
+      </form>
     </div>
   </section>
 
@@ -474,6 +516,7 @@
   <i data-lucide="chevron-down" data-size="20" class="icon-rotate-180"></i>
 </button>
 
-<script src="assets/main.js"></script>
+<script src="assets/supabase-client.js?v=2"></script>
+<script src="assets/main.js?v=2"></script>
 </body>
 </html>

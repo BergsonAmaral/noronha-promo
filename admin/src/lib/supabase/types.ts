@@ -6,6 +6,7 @@ export type UserRole = "cliente" | "parceiro" | "admin";
 export type ParceiroStatus = "pendente" | "aprovado" | "rejeitado" | "inativo";
 export type BeneficioStatus = "ativo" | "pausado" | "expirado";
 export type TipoDesconto = "percentual" | "valor_fixo" | "outro";
+export type ResgateStatus = "aguardando_pagamento" | "pago" | "utilizado" | "expirado" | "cancelado";
 
 export interface Profile {
   id: string;
@@ -53,6 +54,7 @@ export interface Beneficio {
   descricao: string | null;
   tipo_desconto: TipoDesconto;
   valor_desconto: number | null;
+  preco: number;
   condicoes: string | null;
   imagem_url: string | null;
   validade_inicio: string | null;
@@ -63,24 +65,24 @@ export interface Beneficio {
   updated_at: string;
 }
 
+export interface Resgate {
+  id: string;
+  beneficio_id: string;
+  cliente_id: string;
+  codigo: string;
+  status: ResgateStatus;
+  valor_pago: number | null;
+  pago_em: string | null;
+  resgatado_em: string;
+  utilizado_em: string | null;
+}
+
 export interface Lead {
   id: string;
   nome: string;
   email: string;
   consentimento: boolean;
   origem: string | null;
-  created_at: string;
-}
-
-export interface SolicitacaoParceiro {
-  id: string;
-  nome_negocio: string;
-  responsavel: string;
-  email: string;
-  telefone: string | null;
-  categoria_sugerida: string | null;
-  mensagem: string | null;
-  status: ParceiroStatus;
   created_at: string;
 }
 
@@ -104,12 +106,8 @@ export type Database = {
       categorias: { Row: Categoria; Insert: Partial<Categoria>; Update: Partial<Categoria> };
       parceiros: { Row: Parceiro; Insert: Partial<Parceiro>; Update: Partial<Parceiro> };
       beneficios: { Row: Beneficio; Insert: Partial<Beneficio>; Update: Partial<Beneficio> };
+      resgates: { Row: Resgate; Insert: Partial<Resgate>; Update: Partial<Resgate> };
       leads: { Row: Lead; Insert: Partial<Lead>; Update: Partial<Lead> };
-      solicitacoes_parceiro: {
-        Row: SolicitacaoParceiro;
-        Insert: Partial<SolicitacaoParceiro>;
-        Update: Partial<SolicitacaoParceiro>;
-      };
       planos: { Row: Plano; Insert: Partial<Plano>; Update: Partial<Plano> };
     };
   };

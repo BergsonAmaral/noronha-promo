@@ -159,7 +159,7 @@ if (formBusca) {
     e.preventDefault();
     const categoria = document.getElementById("categoria").value;
     // TODO(supabase): substituir por consulta real, ex:
-    // const { data } = await supabase.from('beneficios').select('*').eq('categoria', categoria)
+    // const { data } = await sb.from('beneficios').select('*').eq('categoria', categoria)
     window.location.hash = "beneficios";
     console.info("Buscando benefícios da categoria:", categoria);
   });
@@ -181,12 +181,75 @@ if (formLista) {
       return;
     }
 
-    // TODO(supabase): substituir pelo insert real, ex:
-    // const { error } = await supabase.from('interessados').insert({ nome, email });
-    // if (error) { ... } else { ... }
+    const submitBtn = formLista.querySelector("button[type=submit]");
+    submitBtn.disabled = true;
+
+    const { error } = await sb.from("leads").insert({ nome, email, consentimento });
+
+    submitBtn.disabled = false;
+
+    if (error) {
+      formStatus.textContent = "Não foi possível enviar agora. Tente de novo em instantes.";
+      formStatus.className = "form-status error";
+      return;
+    }
 
     formStatus.textContent = "Cadastro recebido! Em breve entraremos em contato.";
     formStatus.className = "form-status success";
     formLista.reset();
+  });
+}
+
+// Seja um parceiro (cria o negócio como pendente, aguardando aprovação)
+const formParceiro = document.getElementById("form-seja-parceiro");
+const formParceiroStatus = document.getElementById("form-parceiro-status");
+if (formParceiro) {
+  formParceiro.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const nome_negocio = document.getElementById("p-nome-negocio").value.trim();
+    const categoriaSlug = document.getElementById("p-categoria").value;
+    const email = document.getElementById("p-email").value.trim();
+    const telefone = document.getElementById("p-telefone").value.trim();
+    const mensagem = document.getElementById("p-mensagem").value.trim();
+
+    if (!nome_negocio || !email) {
+      formParceiroStatus.textContent = "Preencha ao menos o nome do negócio e o e-mail.";
+      formParceiroStatus.className = "form-status error";
+      return;
+    }
+
+    const submitBtn = formParceiro.querySelector("button[type=submit]");
+    submitBtn.disabled = true;
+
+    let categoria_id = null;
+    if (categoriaSlug) {
+      const { data: categoria } = await sb
+        .from("categorias")
+        .select("id")
+        .eq("slug", categoriaSlug)
+        .single();
+      categoria_id = categoria?.id ?? null;
+    }
+
+    const { error } = await sb.from("parceiros").insert({
+      nome_negocio,
+      categoria_id,
+      email,
+      telefone: telefone || null,
+      descricao: mensagem || null,
+      status: "pendente",
+    });
+
+    submitBtn.disabled = false;
+
+    if (error) {
+      formParceiroStatus.textContent = "Não foi possível enviar agora. Tente de novo em instantes.";
+      formParceiroStatus.className = "form-status error";
+      return;
+    }
+
+    formParceiroStatus.textContent = "Cadastro recebido! Vamos analisar e entrar em contato.";
+    formParceiroStatus.className = "form-status success";
+    formParceiro.reset();
   });
 }

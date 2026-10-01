@@ -512,6 +512,23 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .parceiros .lead { color: #425c5a; margin: 1rem auto 2rem; }
 .parceiros .eyebrow { color: #425c5a; }
 
+.parceiro-form-wrap { max-width: 520px; margin: 48px auto 0; scroll-margin-top: 110px; }
+.parceiro-form-card {
+  background: #fff; border-radius: 16px; padding: 32px;
+  box-shadow: 0 10px 40px rgba(0,0,0,.12); text-align: left;
+}
+.parceiro-form-card h3 { margin-bottom: .25rem; font-size: 1.3rem; color: var(--dark); }
+.parceiro-form-card > p { color: var(--muted); margin-bottom: 1.5rem; font-size: 1rem; }
+.parceiro-form-card label { display: block; font-size: .9rem; font-weight: 600; margin-top: 10px; color: var(--dark); }
+.parceiro-form-card input,
+.parceiro-form-card select,
+.parceiro-form-card textarea {
+  width: 100%; margin-top: 6px; padding: 12px 14px; border-radius: 6px;
+  border: 1px solid var(--line); font-family: var(--font-body); font-size: .95rem;
+  background: #fff; color: var(--text); resize: vertical;
+}
+.parceiro-form-card button { margin-top: 18px; }
+
 /* CTA / Form */
 .cta { background: #eef4f2; }
 .cta-tagline { font-family: var(--font-head); font-size: 1.45rem; color: var(--dark); margin-top: 2rem; }

@@ -8,7 +8,6 @@ import {
   Store,
   Ticket,
   Users,
-  Handshake,
   type LucideIcon,
 } from "lucide-react";
 
@@ -18,7 +17,6 @@ const ICONS: Record<string, LucideIcon> = {
   Store,
   Ticket,
   Users,
-  Handshake,
 };
 
 export function NavLink({

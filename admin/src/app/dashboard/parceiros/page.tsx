@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Parceiro, Categoria, ParceiroStatus } from "@/lib/supabase/types";
-import { atualizarStatusParceiro } from "./actions";
-import { Check, X, PauseCircle, Mail, Phone, Store } from "lucide-react";
+import { atualizarStatusParceiro, criarParceiro, excluirParceiro } from "./actions";
+import { Check, X, PauseCircle, Mail, Phone, Store, Plus, Trash2 } from "lucide-react";
 
 const STATUS_LABEL: Record<ParceiroStatus, string> = {
   pendente: "Pendente",
@@ -32,9 +32,10 @@ export default async function ParceirosPage({
 
   if (status) query = query.eq("status", status as ParceiroStatus);
 
-  const { data: parceiros } = await query.returns<
-    (Parceiro & { categorias: Pick<Categoria, "nome"> | null })[]
-  >();
+  const [{ data: parceiros }, { data: categorias }] = await Promise.all([
+    query.returns<(Parceiro & { categorias: Pick<Categoria, "nome"> | null })[]>(),
+    supabase.from("categorias").select("*").order("ordem").returns<Categoria[]>(),
+  ]);
 
   return (
     <div>
@@ -42,7 +43,8 @@ export default async function ParceirosPage({
         <div>
           <h1 className="font-head text-2xl font-bold text-[#263f40]">Parceiros</h1>
           <p className="mt-1 text-sm text-[#5c6e6f]">
-            Negócios cadastrados no clube — aprove para que apareçam no site.
+            Negócios cadastrados no clube — inclui pedidos feitos pelo site e os que
+            você cadastrar aqui.
           </p>
         </div>
         <div className="flex gap-2 text-sm">
@@ -61,6 +63,75 @@ export default async function ParceirosPage({
           ))}
         </div>
       </div>
+
+      <details className="mt-6 rounded-xl border border-[#e7e2d6] bg-white open:pb-5">
+        <summary className="flex cursor-pointer items-center gap-2 px-4 py-3.5 text-sm font-semibold text-[#263f40]">
+          <Plus size={16} strokeWidth={2.5} />
+          Adicionar parceiro
+        </summary>
+        <form
+          action={criarParceiro}
+          className="grid gap-3 px-4 sm:grid-cols-2"
+        >
+          <div className="flex flex-col gap-1 sm:col-span-2">
+            <label className="text-xs font-medium text-[#5c6e6f]">Nome do negócio</label>
+            <input
+              name="nome_negocio"
+              required
+              placeholder="Ex: Pousada Mar Azul"
+              className="rounded-lg border border-[#e7e2d6] px-3 py-2 text-sm text-[#263f40] outline-none focus:border-[#48696c]"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-[#5c6e6f]">Categoria</label>
+            <select
+              name="categoria_id"
+              className="rounded-lg border border-[#e7e2d6] bg-white px-3 py-2 text-sm text-[#263f40] outline-none focus:border-[#48696c]"
+            >
+              <option value="">Sem categoria</option>
+              {categorias?.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nome}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-[#5c6e6f]">Telefone</label>
+            <input
+              name="telefone"
+              placeholder="(81) 99999-9999"
+              className="rounded-lg border border-[#e7e2d6] px-3 py-2 text-sm text-[#263f40] outline-none focus:border-[#48696c]"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-[#5c6e6f]">E-mail</label>
+            <input
+              name="email"
+              type="email"
+              placeholder="contato@negocio.com.br"
+              className="rounded-lg border border-[#e7e2d6] px-3 py-2 text-sm text-[#263f40] outline-none focus:border-[#48696c]"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-[#5c6e6f]">Descrição</label>
+            <input
+              name="descricao"
+              placeholder="Breve descrição do negócio"
+              className="rounded-lg border border-[#e7e2d6] px-3 py-2 text-sm text-[#263f40] outline-none focus:border-[#48696c]"
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <button
+              type="submit"
+              className="flex items-center gap-2 rounded-lg bg-[#263f40] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#35494b]"
+            >
+              <Plus size={16} strokeWidth={2.5} />
+              Salvar parceiro (já aprovado)
+            </button>
+          </div>
+        </form>
+      </details>
 
       <div className="mt-6 grid gap-4">
         {parceiros?.map((p) => (
@@ -99,6 +170,11 @@ export default async function ParceirosPage({
                       {p.descricao}
                     </p>
                   )}
+                  {p.observacoes_admin && (
+                    <p className="mt-2 max-w-2xl rounded-lg bg-[#f7f8f8] px-3 py-2 text-xs text-[#5c6e6f]">
+                      {p.observacoes_admin}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -127,6 +203,14 @@ export default async function ParceirosPage({
                     </button>
                   </form>
                 )}
+                <form action={excluirParceiro.bind(null, p.id)}>
+                  <button
+                    title="Excluir"
+                    className="flex items-center gap-1.5 rounded-lg border border-[#e7e2d6] px-3 py-1.5 text-xs font-semibold text-[#425c5a] hover:bg-[#f7f8f8]"
+                  >
+                    <Trash2 size={14} strokeWidth={2} />
+                  </button>
+                </form>
               </div>
             </div>
           </div>
