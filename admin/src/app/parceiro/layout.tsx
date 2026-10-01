@@ -1,7 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import type { Profile } from "@/lib/supabase/types";
+import Image from "next/image";
+import type { Profile, Parceiro } from "@/lib/supabase/types";
 import { HOME_BY_ROLE } from "@/lib/role-routing";
+import { signOut } from "@/app/login/actions";
+import { LogOut, ScanLine } from "lucide-react";
 
 export default async function ParceiroLayout({
   children,
@@ -25,5 +28,40 @@ export default async function ParceiroLayout({
     redirect(HOME_BY_ROLE[profile?.role ?? "cliente"]);
   }
 
-  return <div className="min-h-screen bg-[#f7f8f8]">{children}</div>;
+  const { data: negocio } = await supabase
+    .from("parceiros")
+    .select("nome_negocio")
+    .eq("user_id", user.id)
+    .maybeSingle<Pick<Parceiro, "nome_negocio">>();
+
+  return (
+    <div className="flex min-h-screen flex-col bg-[#f7f8f8]">
+      <header className="flex items-center justify-between bg-[#263f40] px-5 py-4">
+        <div className="flex items-center gap-3">
+          <Image src="/logo.png" alt="Noronha Promo" width={34} height={34} />
+          <div>
+            <p className="font-head text-sm font-bold text-white">
+              {negocio?.nome_negocio ?? "Painel do parceiro"}
+            </p>
+            <p className="flex items-center gap-1 text-[10px] tracking-wider text-[#9db1b1] uppercase">
+              <ScanLine size={11} strokeWidth={2} />
+              Validação de cupons
+            </p>
+          </div>
+        </div>
+        <form action={signOut}>
+          <button
+            type="submit"
+            className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-[#e0a9a4] hover:bg-white/5"
+          >
+            <LogOut size={14} strokeWidth={2} />
+            Sair
+          </button>
+        </form>
+      </header>
+      <main className="flex flex-1 items-start justify-center p-5">
+        <div className="w-full max-w-md">{children}</div>
+      </main>
+    </div>
+  );
 }

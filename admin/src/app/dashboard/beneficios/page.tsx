@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Beneficio, Parceiro, Categoria } from "@/lib/supabase/types";
 import { atualizarStatusBeneficio, criarBeneficio, excluirBeneficio } from "./actions";
+import { GerarCupomTeste } from "@/components/gerar-cupom-teste";
 import { Play, Pause, Ticket, CalendarDays, Plus, Trash2, Tag } from "lucide-react";
 
 const STATUS_COLOR = {
@@ -231,6 +232,11 @@ export default async function BeneficiosPage() {
                 </form>
               </div>
             </div>
+            {b.status === "ativo" && (
+              <div className="mt-4 border-t border-dashed border-[#e7e2d6] pt-4">
+                <GerarCupomTeste beneficioId={b.id} />
+              </div>
+            )}
           </div>
         ))}
 
