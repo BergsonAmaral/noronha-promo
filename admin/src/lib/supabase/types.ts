@@ -12,6 +12,7 @@ export interface Profile {
   id: string;
   role: UserRole;
   nome: string;
+  email: string | null;
   telefone: string | null;
   avatar_url: string | null;
   created_at: string;
@@ -75,6 +76,16 @@ export interface Resgate {
   pago_em: string | null;
   resgatado_em: string;
   utilizado_em: string | null;
+}
+
+export interface Mensagem {
+  id: string;
+  parceiro_id: string;
+  remetente_id: string;
+  remetente_role: UserRole;
+  mensagem: string;
+  lida: boolean;
+  created_at: string;
 }
 
 export interface Lead {

@@ -1,0 +1,13 @@
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+
+// Cliente com a service_role key — só pode ser usado em código de servidor
+// (server actions, route handlers). Nunca importe isto em um "use client".
+// Usado para operações da Admin API (criar usuários de login para
+// parceiros e clientes) que a anon key não tem permissão de fazer.
+export function createAdminClient() {
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  );
+}

@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Parceiro, Categoria, ParceiroStatus } from "@/lib/supabase/types";
 import { atualizarStatusParceiro, criarParceiro, excluirParceiro } from "./actions";
+import { CriarAcessoParceiro } from "@/components/criar-acesso-parceiro";
 import { Check, X, PauseCircle, Mail, Phone, Store, Plus, Trash2 } from "lucide-react";
 
 const STATUS_LABEL: Record<ParceiroStatus, string> = {
@@ -213,6 +214,18 @@ export default async function ParceirosPage({
                 </form>
               </div>
             </div>
+
+            {p.status === "aprovado" && (
+              <div className="mt-4 border-t border-dashed border-[#e7e2d6] pt-4">
+                {p.user_id ? (
+                  <p className="text-xs text-[#5c6e6f]">
+                    Este parceiro já tem login próprio.
+                  </p>
+                ) : (
+                  <CriarAcessoParceiro parceiroId={p.id} />
+                )}
+              </div>
+            )}
           </div>
         ))}
 

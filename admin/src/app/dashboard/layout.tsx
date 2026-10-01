@@ -10,7 +10,9 @@ const NAV = [
   { href: "/dashboard", label: "Visão geral", icon: "LayoutGrid" },
   { href: "/dashboard/categorias", label: "Categorias", icon: "Tags" },
   { href: "/dashboard/parceiros", label: "Parceiros", icon: "Store" },
+  { href: "/dashboard/clientes", label: "Clientes", icon: "UserRound" },
   { href: "/dashboard/beneficios", label: "Benefícios", icon: "Ticket" },
+  { href: "/dashboard/mensagens", label: "Mensagens", icon: "MessageCircle" },
   { href: "/dashboard/leads", label: "Leads", icon: "Users" },
 ] as const;
 

@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ScanLine, History, UserCog } from "lucide-react";
+import { ScanLine, History, UserCog, MessageCircle } from "lucide-react";
 
 const TABS = [
   { href: "/parceiro", label: "Validar cupom", icon: ScanLine },
   { href: "/parceiro/historico", label: "Histórico", icon: History },
+  { href: "/parceiro/mensagens", label: "Mensagens", icon: MessageCircle },
   { href: "/parceiro/perfil", label: "Meu perfil", icon: UserCog },
 ];
 
