@@ -8,11 +8,34 @@ import {
   Store,
   Heart,
   Ticket,
+  MapPin,
+  Anchor,
+  Sun,
+  Umbrella,
+  Fish,
+  Sailboat,
+  Binoculars,
+  Mountain,
+  TreePalm,
+  Wine,
+  Coffee,
+  Music,
+  Gift,
+  Star,
+  ShieldCheck,
+  Smartphone,
+  Bike,
+  Backpack,
+  Tent,
+  Sparkles,
+  Sunrise,
+  Luggage,
   type LucideIcon,
 } from "lucide-react";
 
 // Mapeia o nome do ícone salvo no banco (coluna `icone` de categorias)
-// para o componente Lucide correspondente.
+// para o componente Lucide correspondente. A lista aparece no seletor
+// visual de ícones do admin (IconPicker).
 export const ICON_MAP: Record<string, LucideIcon> = {
   compass: Compass,
   waves: Waves,
@@ -23,7 +46,31 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   store: Store,
   heart: Heart,
   ticket: Ticket,
+  "map-pin": MapPin,
+  anchor: Anchor,
+  sun: Sun,
+  umbrella: Umbrella,
+  fish: Fish,
+  sailboat: Sailboat,
+  binoculars: Binoculars,
+  mountain: Mountain,
+  "tree-palm": TreePalm,
+  wine: Wine,
+  coffee: Coffee,
+  music: Music,
+  gift: Gift,
+  star: Star,
+  "shield-check": ShieldCheck,
+  smartphone: Smartphone,
+  bike: Bike,
+  backpack: Backpack,
+  tent: Tent,
+  sparkles: Sparkles,
+  sunrise: Sunrise,
+  luggage: Luggage,
 };
+
+export const ICON_NAMES = Object.keys(ICON_MAP);
 
 export function getIcon(name: string): LucideIcon {
   return ICON_MAP[name] ?? Compass;

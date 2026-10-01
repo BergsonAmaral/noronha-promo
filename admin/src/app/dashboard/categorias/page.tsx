@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Categoria } from "@/lib/supabase/types";
 import { criarCategoria, alternarCategoria, excluirCategoria } from "./actions";
 import { getIcon } from "@/lib/icon-map";
+import { IconPicker } from "@/components/icon-picker";
 import { Plus, Power, Trash2 } from "lucide-react";
 
 export default async function CategoriasPage() {
@@ -21,7 +22,7 @@ export default async function CategoriasPage() {
 
       <form
         action={criarCategoria}
-        className="mt-6 flex flex-wrap items-end gap-3 rounded-xl border border-[#e7e2d6] bg-white p-4"
+        className="mt-6 flex flex-wrap items-start gap-4 rounded-xl border border-[#e7e2d6] bg-white p-4"
       >
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-[#5c6e6f]">Nome</label>
@@ -33,19 +34,12 @@ export default async function CategoriasPage() {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-[#5c6e6f]">
-            Ícone (lucide)
-          </label>
-          <input
-            name="icone"
-            placeholder="compass"
-            defaultValue="compass"
-            className="w-40 rounded-lg border border-[#e7e2d6] px-3 py-2 text-sm text-[#263f40] outline-none focus:border-[#48696c]"
-          />
+          <label className="text-xs font-medium text-[#5c6e6f]">Ícone</label>
+          <IconPicker name="icone" defaultValue="compass" />
         </div>
         <button
           type="submit"
-          className="flex items-center gap-2 rounded-lg bg-[#263f40] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#35494b]"
+          className="flex items-center gap-2 self-end rounded-lg bg-[#263f40] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#35494b]"
         >
           <Plus size={16} strokeWidth={2.5} />
           Adicionar categoria
