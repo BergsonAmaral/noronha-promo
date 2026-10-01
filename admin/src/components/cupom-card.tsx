@@ -2,18 +2,22 @@
 
 import { useState } from "react";
 import { CupomQrModal } from "./cupom-qr-modal";
-import { CheckCircle2, Tag, QrCode } from "lucide-react";
+import { AvaliarModal } from "./avaliar-modal";
+import { CheckCircle2, Tag, QrCode, Star } from "lucide-react";
 import type { TipoDesconto } from "@/lib/supabase/types";
 
 export interface CupomCardData {
+  resgateId: string;
   codigo: string;
   titulo: string;
   parceiro: string;
+  parceiroId: string;
   condicoes: string | null;
   tipo_desconto: TipoDesconto;
   valor_desconto: number | null;
   utilizado: boolean;
   utilizadoEm: string | null;
+  avaliado: boolean;
 }
 
 function formatDesconto(c: CupomCardData) {
@@ -26,12 +30,14 @@ function formatDesconto(c: CupomCardData) {
 
 export function CupomCard({ cupom }: { cupom: CupomCardData }) {
   const [open, setOpen] = useState(false);
+  const [avaliarAberto, setAvaliarAberto] = useState(false);
+  const [avaliado, setAvaliado] = useState(cupom.avaliado);
 
   return (
     <>
       <div
         className={`relative overflow-hidden rounded-2xl bg-white shadow-sm ${
-          cupom.utilizado ? "opacity-60" : ""
+          cupom.utilizado ? "opacity-80" : ""
         }`}
       >
         <div className="p-5 pb-4">
@@ -58,10 +64,20 @@ export function CupomCard({ cupom }: { cupom: CupomCardData }) {
             {cupom.codigo}
           </span>
           {cupom.utilizado ? (
-            <span className="flex items-center gap-1.5 text-sm font-medium text-[#5c6e6f]">
-              <CheckCircle2 size={16} strokeWidth={2} />
-              Usado
-            </span>
+            avaliado ? (
+              <span className="flex items-center gap-1.5 text-sm font-medium text-[#5c6e6f]">
+                <Star size={15} strokeWidth={2} className="fill-[#df9c28] text-[#df9c28]" />
+                Avaliado
+              </span>
+            ) : (
+              <button
+                onClick={() => setAvaliarAberto(true)}
+                className="flex items-center gap-1.5 rounded-full border border-[#df9c28] px-4 py-2 text-sm font-semibold text-[#c78716] transition hover:bg-[#df9c28]/10"
+              >
+                <Star size={15} strokeWidth={2.5} />
+                Avaliar
+              </button>
+            )
           ) : (
             <button
               onClick={() => setOpen(true)}
@@ -80,6 +96,20 @@ export function CupomCard({ cupom }: { cupom: CupomCardData }) {
           titulo={cupom.titulo}
           parceiro={cupom.parceiro}
           onClose={() => setOpen(false)}
+        />
+      )}
+
+      {avaliarAberto && (
+        <AvaliarModal
+          resgateId={cupom.resgateId}
+          parceiroId={cupom.parceiroId}
+          titulo={cupom.titulo}
+          parceiro={cupom.parceiro}
+          onClose={() => setAvaliarAberto(false)}
+          onEnviado={() => {
+            setAvaliado(true);
+            setAvaliarAberto(false);
+          }}
         />
       )}
     </>

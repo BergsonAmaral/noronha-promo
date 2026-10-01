@@ -25,6 +25,37 @@ export async function signIn(formData: FormData) {
   redirect(HOME_BY_ROLE[profile?.role ?? "cliente"]);
 }
 
+export async function signUp(formData: FormData) {
+  const nome = String(formData.get("nome") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
+
+  if (!nome || !email || password.length < 6) {
+    redirect(
+      `/login/cadastro?error=${encodeURIComponent(
+        "Preencha nome, e-mail e uma senha com pelo menos 6 caracteres."
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { nome, role: "cliente" } },
+  });
+
+  if (error) {
+    redirect(`/login/cadastro?error=${encodeURIComponent(error.message)}`);
+  }
+
+  if (data.session) {
+    redirect(HOME_BY_ROLE.cliente);
+  }
+
+  redirect("/login/cadastro?confirmar=1");
+}
+
 export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();

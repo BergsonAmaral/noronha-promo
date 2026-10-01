@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import type { Categoria, Parceiro } from "@/lib/supabase/types";
+import type { Avaliacao, Categoria, Parceiro, Profile } from "@/lib/supabase/types";
 import { PerfilForm } from "./perfil-form";
+import { AvaliacoesResumo } from "@/components/avaliacoes-resumo";
 
 export default async function PerfilParceiroPage() {
   const supabase = await createClient();
@@ -26,13 +27,24 @@ export default async function PerfilParceiroPage() {
     );
   }
 
+  const { data: avaliacoes } = await supabase
+    .from("avaliacoes")
+    .select("*, profiles(nome)")
+    .eq("parceiro_id", parceiro.id)
+    .order("created_at", { ascending: false })
+    .returns<(Avaliacao & { profiles: Pick<Profile, "nome"> | null })[]>();
+
   return (
-    <div className="rounded-2xl bg-white p-6 shadow-sm">
-      <h1 className="font-head text-xl font-bold text-[#263f40]">Meu perfil</h1>
-      <p className="mt-1 mb-6 text-sm text-[#5c6e6f]">
-        Dados do seu negócio exibidos no site e para os clientes.
-      </p>
-      <PerfilForm parceiro={parceiro} categorias={categorias ?? []} />
+    <div className="flex flex-col gap-5">
+      <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <h1 className="font-head text-xl font-bold text-[#263f40]">Meu perfil</h1>
+        <p className="mt-1 mb-6 text-sm text-[#5c6e6f]">
+          Dados do seu negócio exibidos no site e para os clientes.
+        </p>
+        <PerfilForm parceiro={parceiro} categorias={categorias ?? []} />
+      </div>
+
+      <AvaliacoesResumo avaliacoes={avaliacoes ?? []} />
     </div>
   );
 }

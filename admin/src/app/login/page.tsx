@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { signIn } from "./actions";
 
 export default async function LoginPage({
@@ -130,7 +131,10 @@ export default async function LoginPage({
           </div>
 
           <p className="mt-6 text-center text-xs text-[#5c6e6f]">
-            Acesso restrito à equipe Noronha Promo.
+            É cliente e ainda não tem conta?{" "}
+            <Link href="/login/cadastro" className="font-semibold text-[#48696c] hover:underline">
+              Criar conta
+            </Link>
           </p>
         </div>
       </div>

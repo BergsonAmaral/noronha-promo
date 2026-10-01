@@ -88,6 +88,16 @@ export interface Mensagem {
   created_at: string;
 }
 
+export interface Avaliacao {
+  id: string;
+  parceiro_id: string;
+  cliente_id: string;
+  resgate_id: string | null;
+  nota: number;
+  comentario: string | null;
+  created_at: string;
+}
+
 export interface Lead {
   id: string;
   nome: string;

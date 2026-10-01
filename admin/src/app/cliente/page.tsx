@@ -1,27 +1,30 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import type { Beneficio, Parceiro, Resgate } from "@/lib/supabase/types";
+import type { Avaliacao, Beneficio, Parceiro, Resgate } from "@/lib/supabase/types";
 import { CupomCard, type CupomCardData } from "@/components/cupom-card";
 import { Ticket } from "lucide-react";
 
 type ResgateComDetalhes = Resgate & {
   beneficios:
-    | (Pick<Beneficio, "titulo" | "tipo_desconto" | "valor_desconto" | "condicoes"> & {
+    | (Pick<Beneficio, "titulo" | "tipo_desconto" | "valor_desconto" | "condicoes" | "parceiro_id"> & {
         parceiros: Pick<Parceiro, "nome_negocio"> | null;
       })
     | null;
 };
 
-function toCard(r: ResgateComDetalhes): CupomCardData {
+function toCard(r: ResgateComDetalhes, resgatesAvaliados: Set<string>): CupomCardData {
   return {
+    resgateId: r.id,
     codigo: r.codigo,
     titulo: r.beneficios?.titulo ?? "Benefício",
     parceiro: r.beneficios?.parceiros?.nome_negocio ?? "Noronha Promo",
+    parceiroId: r.beneficios?.parceiro_id ?? "",
     condicoes: r.beneficios?.condicoes ?? null,
     tipo_desconto: r.beneficios?.tipo_desconto ?? "outro",
     valor_desconto: r.beneficios?.valor_desconto ?? null,
     utilizado: r.status === "utilizado",
     utilizadoEm: r.utilizado_em,
+    avaliado: resgatesAvaliados.has(r.id),
   };
 }
 
@@ -32,16 +35,33 @@ export default async function ClientePage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: resgates } = await supabase
-    .from("resgates")
-    .select("*, beneficios(titulo, tipo_desconto, valor_desconto, condicoes, parceiros(nome_negocio))")
-    .eq("cliente_id", user.id)
-    .in("status", ["pago", "utilizado"])
-    .order("resgatado_em", { ascending: false })
-    .returns<ResgateComDetalhes[]>();
+  const [{ data: resgates }, { data: avaliacoes }] = await Promise.all([
+    supabase
+      .from("resgates")
+      .select(
+        "*, beneficios(titulo, tipo_desconto, valor_desconto, condicoes, parceiro_id, parceiros(nome_negocio))"
+      )
+      .eq("cliente_id", user.id)
+      .in("status", ["pago", "utilizado"])
+      .order("resgatado_em", { ascending: false })
+      .returns<ResgateComDetalhes[]>(),
+    supabase
+      .from("avaliacoes")
+      .select("resgate_id")
+      .eq("cliente_id", user.id)
+      .returns<Pick<Avaliacao, "resgate_id">[]>(),
+  ]);
 
-  const disponiveis = (resgates ?? []).filter((r) => r.status === "pago").map(toCard);
-  const usados = (resgates ?? []).filter((r) => r.status === "utilizado").map(toCard);
+  const resgatesAvaliados = new Set(
+    (avaliacoes ?? []).map((a) => a.resgate_id).filter((id): id is string => !!id)
+  );
+
+  const disponiveis = (resgates ?? [])
+    .filter((r) => r.status === "pago")
+    .map((r) => toCard(r, resgatesAvaliados));
+  const usados = (resgates ?? [])
+    .filter((r) => r.status === "utilizado")
+    .map((r) => toCard(r, resgatesAvaliados));
 
   if (!disponiveis.length && !usados.length) {
     return (
