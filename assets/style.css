@@ -598,6 +598,14 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .guia-card:hover { transform: translateY(-6px); box-shadow: 0 20px 36px -18px rgba(38,63,64,.35); }
 .guia-card img { height: 180px; object-fit: cover; transition: transform .5s ease; }
 .guia-card:hover img { transform: scale(1.08); }
+.guia-visual {
+  height: 180px; display: flex; align-items: center; justify-content: center;
+  color: #fff; transition: transform .5s ease;
+}
+.guia-card:hover .guia-visual { transform: scale(1.06); }
+.guia-visual-1 { background: linear-gradient(135deg, var(--dark), var(--teal)); }
+.guia-visual-2 { background: linear-gradient(135deg, var(--teal), var(--gold-dark)); }
+.guia-visual-3 { background: linear-gradient(135deg, var(--gold-dark), var(--dark)); }
 .guia-content { padding: 22px; }
 .guia-content h3 { font-size: 1.15rem; }
 .guia-content p { color: var(--muted); font-size: .95rem; }
