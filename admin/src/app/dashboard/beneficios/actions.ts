@@ -19,8 +19,12 @@ export async function criarBeneficio(formData: FormData) {
   const valor_desconto = formData.get("valor_desconto")
     ? Number(formData.get("valor_desconto"))
     : null;
+  const valor_original = formData.get("valor_original")
+    ? Number(formData.get("valor_original"))
+    : null;
   const preco = Number(formData.get("preco") ?? 0);
   const condicoes = String(formData.get("condicoes") ?? "").trim();
+  const imagem_url = String(formData.get("imagem_url") ?? "").trim();
   const validade_fim = String(formData.get("validade_fim") ?? "") || null;
 
   if (!parceiro_id || !titulo) return;
@@ -33,8 +37,10 @@ export async function criarBeneficio(formData: FormData) {
     descricao: descricao || null,
     tipo_desconto,
     valor_desconto,
+    valor_original,
     preco,
     condicoes: condicoes || null,
+    imagem_url: imagem_url || null,
     validade_fim,
     status: "ativo",
   });

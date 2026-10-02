@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Search, Tag, Clock } from "lucide-react";
+import { useMemo, useState, useTransition } from "react";
+import { Search, Tag, ShoppingBag, Check } from "lucide-react";
 import { getIcon } from "@/lib/icon-map";
 import type { TipoDesconto } from "@/lib/supabase/types";
+import { comprarBeneficio } from "@/lib/compra-actions";
+import { CupomQrModal } from "@/components/cupom-qr-modal";
 
 export interface CategoriaChip {
   id: string;
@@ -17,7 +19,9 @@ export interface DescobrirItem {
   condicoes: string | null;
   tipo_desconto: TipoDesconto;
   valor_desconto: number | null;
+  valor_original: number | null;
   preco: number;
+  imagemUrl: string | null;
   parceiro: string;
   categoriaId: string | null;
   categoriaNome: string;
@@ -36,6 +40,18 @@ function formatPreco(preco: number) {
   return preco > 0 ? `R$ ${preco.toFixed(2).replace(".", ",")}` : "Grátis";
 }
 
+function valorComDesconto(item: DescobrirItem) {
+  if (!item.valor_original) return null;
+  let final: number | null = null;
+  if (item.tipo_desconto === "percentual" && item.valor_desconto) {
+    final = item.valor_original * (1 - item.valor_desconto / 100);
+  } else if (item.tipo_desconto === "valor_fixo" && item.valor_desconto) {
+    final = item.valor_original - item.valor_desconto;
+  }
+  if (final == null || final < 0) return null;
+  return { original: item.valor_original, final };
+}
+
 export function DescobrirList({
   categorias,
   itens,
@@ -45,6 +61,30 @@ export function DescobrirList({
 }) {
   const [busca, setBusca] = useState("");
   const [categoriaAtiva, setCategoriaAtiva] = useState<string | null>(null);
+  const [comprandoId, setComprandoId] = useState<string | null>(null);
+  const [compradosIds, setCompradosIds] = useState<Set<string>>(new Set());
+  const [erros, setErros] = useState<Record<string, string>>({});
+  const [cupomComprado, setCupomComprado] = useState<{
+    codigo: string;
+    titulo: string;
+    parceiro: string;
+  } | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  function comprar(item: DescobrirItem) {
+    setComprandoId(item.id);
+    setErros((prev) => ({ ...prev, [item.id]: "" }));
+    startTransition(async () => {
+      const { error, codigo } = await comprarBeneficio(item.id);
+      setComprandoId(null);
+      if (error || !codigo) {
+        setErros((prev) => ({ ...prev, [item.id]: error ?? "Não foi possível comprar agora." }));
+        return;
+      }
+      setCompradosIds((prev) => new Set(prev).add(item.id));
+      setCupomComprado({ codigo, titulo: item.titulo, parceiro: item.parceiro });
+    });
+  }
 
   const filtrados = useMemo(() => {
     const termo = busca.trim().toLowerCase();
@@ -109,37 +149,78 @@ export function DescobrirList({
       <div className="flex flex-col gap-3">
         {filtrados.map((item) => {
           const Icon = getIcon(item.categoriaIcone);
+          const precos = valorComDesconto(item);
+          const comprado = compradosIds.has(item.id);
+          const erro = erros[item.id];
           return (
             <div
               key={item.id}
-              className="flex gap-3 rounded-2xl bg-white p-4 shadow-sm"
+              className="overflow-hidden rounded-2xl bg-white shadow-sm"
             >
-              <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[#df9c28]/12 text-[#c78716]">
-                <Icon size={19} strokeWidth={2} />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-semibold tracking-wide text-[#9db1b1] uppercase">
-                  {item.parceiro}
-                </p>
-                <h3 className="mt-0.5 font-head text-sm leading-snug font-bold text-[#263f40]">
-                  {item.titulo}
-                </h3>
-                <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#5c6e6f]">
-                  <span className="flex items-center gap-1 font-medium text-[#48696c]">
-                    <Tag size={12} strokeWidth={2.5} />
-                    {formatDesconto(item)}
+              {item.imagemUrl && (
+                <div
+                  className="h-28 w-full bg-cover bg-center"
+                  style={{ backgroundImage: `url(${item.imagemUrl})` }}
+                />
+              )}
+              <div className="flex gap-3 p-4">
+                {!item.imagemUrl && (
+                  <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[#df9c28]/12 text-[#c78716]">
+                    <Icon size={19} strokeWidth={2} />
                   </span>
-                  <span>{formatPreco(item.preco)}</span>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11px] font-semibold tracking-wide text-[#9db1b1] uppercase">
+                    {item.parceiro}
+                  </p>
+                  <h3 className="mt-0.5 font-head text-sm leading-snug font-bold text-[#263f40]">
+                    {item.titulo}
+                  </h3>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#5c6e6f]">
+                    <span className="flex items-center gap-1 font-medium text-[#48696c]">
+                      <Tag size={12} strokeWidth={2.5} />
+                      {formatDesconto(item)}
+                    </span>
+                  </div>
+                  {precos && (
+                    <p className="mt-1 text-xs">
+                      <span className="text-[#9db1b1] line-through">
+                        {formatPreco(precos.original)}
+                      </span>{" "}
+                      <span className="font-semibold text-[#48696c]">
+                        por {formatPreco(precos.final)}
+                      </span>
+                    </p>
+                  )}
+                  <p className="mt-1 text-xs text-[#9db1b1]">
+                    {formatPreco(item.preco)} <span>o cupom</span>
+                  </p>
+
+                  {erro && <p className="mt-1.5 text-xs text-[#b3261e]">{erro}</p>}
+
+                  <button
+                    onClick={() => (comprado ? setCupomComprado(null) : comprar(item))}
+                    disabled={isPending && comprandoId === item.id}
+                    className={`mt-3 flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold transition disabled:opacity-60 ${
+                      comprado
+                        ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
+                        : "bg-[#263f40] text-white hover:bg-[#35494b]"
+                    }`}
+                  >
+                    {comprado ? (
+                      <>
+                        <Check size={13} strokeWidth={2.5} />
+                        Comprado
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingBag size={13} strokeWidth={2.5} />
+                        {isPending && comprandoId === item.id ? "Comprando..." : "Comprar"}
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
-              <button
-                disabled
-                title="A compra pelo site chega em breve"
-                className="flex h-fit flex-shrink-0 items-center gap-1 rounded-full border border-[#e7e2d6] px-3 py-1.5 text-xs font-medium text-[#9db1b1]"
-              >
-                <Clock size={12} strokeWidth={2} />
-                Em breve
-              </button>
             </div>
           );
         })}
@@ -150,6 +231,15 @@ export function DescobrirList({
           </div>
         )}
       </div>
+
+      {cupomComprado && (
+        <CupomQrModal
+          codigo={cupomComprado.codigo}
+          titulo={cupomComprado.titulo}
+          parceiro={cupomComprado.parceiro}
+          onClose={() => setCupomComprado(null)}
+        />
+      )}
     </div>
   );
 }

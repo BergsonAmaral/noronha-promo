@@ -6,7 +6,10 @@ import { Ticket } from "lucide-react";
 
 type ResgateComDetalhes = Resgate & {
   beneficios:
-    | (Pick<Beneficio, "titulo" | "tipo_desconto" | "valor_desconto" | "condicoes" | "parceiro_id"> & {
+    | (Pick<
+        Beneficio,
+        "titulo" | "tipo_desconto" | "valor_desconto" | "condicoes" | "parceiro_id" | "imagem_url"
+      > & {
         parceiros: Pick<Parceiro, "nome_negocio"> | null;
       })
     | null;
@@ -22,6 +25,7 @@ function toCard(r: ResgateComDetalhes, resgatesAvaliados: Set<string>): CupomCar
     condicoes: r.beneficios?.condicoes ?? null,
     tipo_desconto: r.beneficios?.tipo_desconto ?? "outro",
     valor_desconto: r.beneficios?.valor_desconto ?? null,
+    imagemUrl: r.beneficios?.imagem_url ?? null,
     utilizado: r.status === "utilizado",
     utilizadoEm: r.utilizado_em,
     avaliado: resgatesAvaliados.has(r.id),
@@ -39,7 +43,7 @@ export default async function ClientePage() {
     supabase
       .from("resgates")
       .select(
-        "*, beneficios(titulo, tipo_desconto, valor_desconto, condicoes, parceiro_id, parceiros(nome_negocio))"
+        "*, beneficios(titulo, tipo_desconto, valor_desconto, condicoes, parceiro_id, imagem_url, parceiros(nome_negocio))"
       )
       .eq("cliente_id", user.id)
       .in("status", ["pago", "utilizado"])

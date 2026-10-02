@@ -22,6 +22,18 @@ function formatDesconto(b: Beneficio) {
   return b.condicoes ?? "—";
 }
 
+function formatValorComDesconto(b: Beneficio) {
+  if (!b.valor_original) return null;
+  const final =
+    b.tipo_desconto === "percentual" && b.valor_desconto
+      ? b.valor_original * (1 - b.valor_desconto / 100)
+      : b.tipo_desconto === "valor_fixo" && b.valor_desconto
+        ? b.valor_original - b.valor_desconto
+        : null;
+  if (final == null) return null;
+  return `De ${formatPreco(b.valor_original)} por ${formatPreco(final)}`;
+}
+
 export default async function BeneficiosPage() {
   const supabase = await createClient();
   const [{ data: beneficios }, { data: parceiros }, { data: categorias }] = await Promise.all([
@@ -127,6 +139,23 @@ export default async function BeneficiosPage() {
 
           <div className="flex flex-col gap-1">
             <label className="text-xs font-medium text-[#5c6e6f]">
+              Valor cheio do serviço (R$)
+            </label>
+            <input
+              name="valor_original"
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="250"
+              className="rounded-lg border border-[#e7e2d6] px-3 py-2 text-sm text-[#263f40] outline-none focus:border-[#48696c]"
+            />
+            <p className="text-xs text-[#5c6e6f]">
+              Preço de tabela, antes do desconto do parceiro
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-[#5c6e6f]">
               Preço do cupom (R$)
             </label>
             <input
@@ -158,6 +187,15 @@ export default async function BeneficiosPage() {
             />
           </div>
 
+          <div className="flex flex-col gap-1 sm:col-span-2">
+            <label className="text-xs font-medium text-[#5c6e6f]">Foto (URL)</label>
+            <input
+              name="imagem_url"
+              placeholder="https://..."
+              className="rounded-lg border border-[#e7e2d6] px-3 py-2 text-sm text-[#263f40] outline-none focus:border-[#48696c]"
+            />
+          </div>
+
           <div className="sm:col-span-2">
             <button
               type="submit"
@@ -175,9 +213,18 @@ export default async function BeneficiosPage() {
           <div key={b.id} className="rounded-xl border border-[#e7e2d6] bg-white p-5">
             <div className="flex items-start justify-between gap-4">
               <div className="flex gap-4">
-                <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-[#df9c28]/12 text-[#c78716]">
-                  <Ticket size={19} strokeWidth={2} />
-                </span>
+                {b.imagem_url ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={b.imagem_url}
+                    alt=""
+                    className="h-16 w-16 flex-shrink-0 rounded-lg object-cover"
+                  />
+                ) : (
+                  <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-[#df9c28]/12 text-[#c78716]">
+                    <Ticket size={19} strokeWidth={2} />
+                  </span>
+                )}
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="font-head font-semibold text-[#263f40]">{b.titulo}</h3>
@@ -190,6 +237,11 @@ export default async function BeneficiosPage() {
                   <p className="mt-1 text-sm text-[#5c6e6f]">
                     {b.parceiros?.nome_negocio ?? "Sem parceiro"} · {formatDesconto(b)}
                   </p>
+                  {formatValorComDesconto(b) && (
+                    <p className="mt-0.5 text-sm font-medium text-[#48696c]">
+                      {formatValorComDesconto(b)}
+                    </p>
+                  )}
                   <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#5c6e6f]">
                     <span className="flex items-center gap-1.5">
                       <Tag size={14} strokeWidth={2} />

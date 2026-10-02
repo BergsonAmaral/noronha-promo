@@ -466,6 +466,19 @@ a, button { -webkit-tap-highlight-color: transparent; }
 }
 .beneficios-status-invert { color: #cfe0e0; }
 
+/* Foto do cupom (sangria até a borda do card, topo) */
+.cupom-foto {
+  height: 150px; margin: -28px -28px 8px; border-radius: var(--radius) var(--radius) 0 0;
+  background-size: cover; background-position: center;
+}
+.beneficio-card .cupom-foto { margin: -22px -22px 8px; height: 130px; }
+
+/* Preço "De X por Y" (valor cheio do serviço com o desconto aplicado) */
+.valor-servico { margin: 2px 0 0; font-size: .85rem; }
+.valor-servico .de { color: var(--muted); text-decoration: line-through; margin-right: 6px; }
+.valor-servico .por { color: var(--teal); font-weight: 700; }
+.preco-label-inline { font-weight: 400; color: var(--muted); }
+
 /* Benefícios (grid real, vindo do Supabase) */
 .beneficios-wrap { max-width: 1040px; margin: 48px auto 0; }
 .beneficios-grid {
@@ -473,7 +486,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
   text-align: left;
 }
 .beneficio-card {
-  background: #fff; border-radius: var(--radius); padding: 22px;
+  position: relative; background: #fff; border-radius: var(--radius); padding: 22px;
   display: flex; flex-direction: column; gap: 8px; color: var(--text);
   transition: transform .25s ease, box-shadow .25s ease;
 }
@@ -490,6 +503,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
   margin-top: 8px; font-size: .85rem; font-weight: 600; color: var(--gold-dark);
   display: inline-flex; align-items: center; gap: 4px; text-decoration: none;
 }
+.beneficio-card .cupom-badge { top: 8px; right: 8px; font-size: .72rem; padding: 5px 11px; }
 .beneficios-status { color: #cfe0e0; margin-top: 20px; text-align: center; }
 .beneficios-status.is-empty, .beneficios-status.is-error { color: #cfe0e0; }
 

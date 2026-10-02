@@ -170,6 +170,36 @@ function formatPreco(preco) {
   return preco > 0 ? `R$ ${Number(preco).toFixed(2).replace(".", ",")}` : "Grátis";
 }
 
+// Preço cheio do serviço (de tabela) vs. o preço já com o desconto do
+// parceiro aplicado — pra mostrar "De R$250 por R$175".
+function valorComDesconto(b) {
+  if (!b.valor_original) return null;
+  let final = null;
+  if (b.tipo_desconto === "percentual" && b.valor_desconto) {
+    final = b.valor_original * (1 - b.valor_desconto / 100);
+  } else if (b.tipo_desconto === "valor_fixo" && b.valor_desconto) {
+    final = b.valor_original - b.valor_desconto;
+  }
+  if (final == null || final < 0) return null;
+  return { original: b.valor_original, final };
+}
+
+function precoComDescontoHtml(b) {
+  const precos = valorComDesconto(b);
+  if (!precos) return "";
+  return `
+    <p class="valor-servico">
+      <span class="de">De ${formatPreco(precos.original)}</span>
+      <span class="por">por ${formatPreco(precos.final)}</span>
+    </p>
+  `;
+}
+
+function imagemHtml(b, alt) {
+  if (!b.imagem_url) return "";
+  return `<div class="cupom-foto" style="background-image:url('${b.imagem_url}')" role="img" aria-label="${alt}"></div>`;
+}
+
 function renderBeneficios(lista) {
   if (!beneficiosGrid) return;
 
@@ -186,13 +216,16 @@ function renderBeneficios(lista) {
     .map((b) => {
       const categoria = b.categorias;
       const parceiro = b.parceiros;
+      const badge = formatBadge(b);
       return `
         <article class="beneficio-card">
+          ${imagemHtml(b, b.titulo)}
+          ${badge ? `<span class="cupom-badge">${badge}</span>` : ""}
           <span class="cat-tag"><i data-lucide="${categoria?.icone || "compass"}" data-size="14"></i> ${categoria?.nome || "Geral"}</span>
           <h3>${b.titulo}</h3>
           <p class="parceiro">${parceiro?.nome_negocio || "Noronha Promo"}</p>
-          <p class="desconto">${formatDesconto(b)}</p>
-          <p class="preco">${formatPreco(b.preco)}</p>
+          ${precoComDescontoHtml(b)}
+          <p class="preco">${formatPreco(b.preco)} <span class="preco-label-inline">o cupom</span></p>
           <a class="cta" href="/portal/login/cadastro">Criar conta para aproveitar <i data-lucide="arrow-right" data-size="14"></i></a>
         </article>
       `;
@@ -233,11 +266,13 @@ function renderCuponsDestaque(lista) {
       const parceiro = b.parceiros;
       const badge = formatBadge(b);
       return `
-        <article class="cupom-card">
+        <article class="cupom-card ${b.imagem_url ? "tem-foto" : ""}">
+          ${imagemHtml(b, b.titulo)}
           ${badge ? `<span class="cupom-badge">${badge}</span>` : ""}
           <span class="cupom-cat"><i data-lucide="${categoria?.icone || "compass"}" data-size="14"></i> ${categoria?.nome || "Geral"}</span>
           <h3>${b.titulo}</h3>
           <p class="cupom-parceiro">${parceiro?.nome_negocio || "Noronha Promo"}</p>
+          ${precoComDescontoHtml(b)}
           <div class="cupom-preco">
             <span class="valor">${formatPreco(b.preco)}</span>
             <span class="label">valor do cupom</span>

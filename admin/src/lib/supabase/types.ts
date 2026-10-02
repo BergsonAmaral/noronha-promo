@@ -55,6 +55,7 @@ export interface Beneficio {
   descricao: string | null;
   tipo_desconto: TipoDesconto;
   valor_desconto: number | null;
+  valor_original: number | null;
   preco: number;
   condicoes: string | null;
   imagem_url: string | null;

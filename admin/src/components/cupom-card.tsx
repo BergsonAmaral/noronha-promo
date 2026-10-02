@@ -15,6 +15,7 @@ export interface CupomCardData {
   condicoes: string | null;
   tipo_desconto: TipoDesconto;
   valor_desconto: number | null;
+  imagemUrl: string | null;
   utilizado: boolean;
   utilizadoEm: string | null;
   avaliado: boolean;
@@ -40,6 +41,12 @@ export function CupomCard({ cupom }: { cupom: CupomCardData }) {
           cupom.utilizado ? "opacity-80" : ""
         }`}
       >
+        {cupom.imagemUrl && (
+          <div
+            className="h-32 w-full bg-cover bg-center"
+            style={{ backgroundImage: `url(${cupom.imagemUrl})` }}
+          />
+        )}
         <div className="p-5 pb-4">
           <p className="text-xs font-semibold tracking-wide text-[#c78716] uppercase">
             {cupom.parceiro}
