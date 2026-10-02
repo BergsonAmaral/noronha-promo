@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { alterarSenha } from "./actions";
+import { alterarSenha } from "@/lib/conta-actions";
 import { KeyRound, Check } from "lucide-react";
 
 export function AlterarSenhaForm() {

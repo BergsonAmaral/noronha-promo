@@ -10,6 +10,8 @@ import {
   Users,
   UserRound,
   MessageCircle,
+  Star,
+  Settings,
   type LucideIcon,
 } from "lucide-react";
 
@@ -21,6 +23,8 @@ const ICONS: Record<string, LucideIcon> = {
   Users,
   UserRound,
   MessageCircle,
+  Star,
+  Settings,
 };
 
 export function NavLink({
