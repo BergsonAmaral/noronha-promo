@@ -12,32 +12,13 @@ export async function comprarBeneficio(
   } = await supabase.auth.getUser();
   if (!user) return { error: "Não autenticado.", codigo: null };
 
-  const { data: beneficio } = await supabase
-    .from("beneficios")
-    .select("preco, status")
-    .eq("id", beneficioId)
-    .single();
-
-  if (!beneficio) return { error: "Benefício não encontrado.", codigo: null };
-  if (beneficio.status !== "ativo") {
-    return { error: "Esse benefício não está mais disponível.", codigo: null };
-  }
-
-  const { data, error } = await supabase
-    .from("resgates")
-    .insert({
-      beneficio_id: beneficioId,
-      cliente_id: user.id,
-      status: "pago",
-      valor_pago: beneficio.preco,
-      pago_em: new Date().toISOString(),
-    })
-    .select("codigo")
-    .single();
+  const { data, error } = await supabase.rpc("comprar_beneficio", {
+    p_beneficio_id: beneficioId,
+  });
 
   if (error) return { error: error.message, codigo: null };
 
   revalidatePath("/cliente");
   revalidatePath("/cliente/descobrir");
-  return { error: null, codigo: data.codigo };
+  return { error: null, codigo: data as string };
 }

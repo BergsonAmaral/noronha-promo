@@ -238,7 +238,7 @@ function renderBeneficios(lista) {
             <span class="valor">${formatPreco(b.preco)}</span>
             <span class="label">valor do cupom</span>
           </div>
-          <a class="btn btn-gold cupom-cta" href="/portal/login/cadastro">Quero esse cupom <i data-lucide="arrow-right" data-size="14"></i></a>
+          <a class="btn btn-gold cupom-cta" href="/portal/cliente/descobrir">Comprar cupom <i data-lucide="arrow-right" data-size="14"></i></a>
         </article>
       `;
     })
@@ -350,6 +350,7 @@ if (formLista) {
     const nome = document.getElementById("nome").value.trim();
     const email = document.getElementById("email").value.trim();
     const consentimento = document.getElementById("consentimento").checked;
+    if (document.getElementById("hp-lista").value) return;
 
     if (!nome || !email || !consentimento) {
       formStatus.textContent = "Preencha nome, e-mail e aceite os termos.";
@@ -387,6 +388,7 @@ if (formParceiro) {
     const email = document.getElementById("p-email").value.trim();
     const telefone = document.getElementById("p-telefone").value.trim();
     const mensagem = document.getElementById("p-mensagem").value.trim();
+    if (document.getElementById("hp-parceiro").value) return;
 
     if (!nome_negocio || !email) {
       formParceiroStatus.textContent = "Preencha ao menos o nome do negócio e o e-mail.";

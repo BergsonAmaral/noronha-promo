@@ -47,7 +47,8 @@ export async function criarAcessoParceiro(
     email: email.trim(),
     password: senha,
     email_confirm: true,
-    user_metadata: { nome: parceiro.nome_negocio, role: "parceiro" },
+    user_metadata: { nome: parceiro.nome_negocio },
+    app_metadata: { role: "parceiro" },
   });
   if (erroCriacao) return { error: erroCriacao.message };
 

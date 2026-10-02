@@ -5,6 +5,32 @@ import { redirect } from "next/navigation";
 import type { Profile } from "@/lib/supabase/types";
 import { HOME_BY_ROLE } from "@/lib/role-routing";
 
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.noronhapromo.com.br";
+
+export async function pedirRedefinicao(formData: FormData) {
+  const email = String(formData.get("email") ?? "").trim();
+  if (email) {
+    const supabase = await createClient();
+    await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${SITE}/portal/auth/callback?next=/redefinir-senha`,
+    });
+  }
+  redirect("/login/esqueci?enviado=1");
+}
+
+export async function reenviarConfirmacao(formData: FormData) {
+  const email = String(formData.get("email") ?? "").trim();
+  if (email) {
+    const supabase = await createClient();
+    await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: `${SITE}/portal/auth/callback?next=/cliente` },
+    });
+  }
+  redirect("/login/esqueci?reenviado=1");
+}
+
 export async function signIn(formData: FormData) {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
@@ -42,7 +68,7 @@ export async function signUp(formData: FormData) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { nome, role: "cliente" } },
+    options: { data: { nome }, emailRedirectTo: `${SITE}/portal/auth/callback?next=/cliente` },
   });
 
   if (error) {

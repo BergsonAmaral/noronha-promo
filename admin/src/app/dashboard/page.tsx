@@ -1,10 +1,11 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Tags, Store, Clock, Ticket, Users, type LucideIcon } from "lucide-react";
+import { Tags, Store, Clock, Ticket, Users, ShoppingBag, Wallet, UserRound, type LucideIcon } from "lucide-react";
 
 async function getCounts() {
   const supabase = await createClient();
 
-  const [categorias, parceiros, parceirosPendentes, beneficios, leads] = await Promise.all([
+  const [categorias, parceiros, parceirosPendentes, beneficios, leads, resgates, clientes] = await Promise.all([
     supabase.from("categorias").select("id", { count: "exact", head: true }),
     supabase.from("parceiros").select("id", { count: "exact", head: true }),
     supabase
@@ -13,7 +14,10 @@ async function getCounts() {
       .eq("status", "pendente"),
     supabase.from("beneficios").select("id", { count: "exact", head: true }),
     supabase.from("leads").select("id", { count: "exact", head: true }),
+    supabase.from("resgates").select("status, valor_pago"),
+    supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", "cliente"),
   ]);
+  const vendas = (resgates.data ?? []).filter((r) => r.status === "pago" || r.status === "utilizado");
 
   return {
     categorias: categorias.count ?? 0,
@@ -21,6 +25,10 @@ async function getCounts() {
     parceirosPendentes: parceirosPendentes.count ?? 0,
     beneficios: beneficios.count ?? 0,
     leads: leads.count ?? 0,
+    clientes: clientes.count ?? 0,
+    vendas: vendas.length,
+    usados: vendas.filter((r) => r.status === "utilizado").length,
+    faturamento: vendas.reduce((acc, r) => acc + Number(r.valor_pago ?? 0), 0),
   };
 }
 
@@ -30,6 +38,7 @@ export default async function DashboardPage() {
   const cards: {
     label: string;
     value: number;
+    money?: boolean;
     href: string;
     icon: LucideIcon;
     highlight?: boolean;
@@ -50,6 +59,16 @@ export default async function DashboardPage() {
       icon: Ticket,
     },
     { label: "Leads cadastrados", value: counts.leads, href: "/dashboard/leads", icon: Users },
+    { label: "Clientes", value: counts.clientes, href: "/dashboard/clientes", icon: UserRound },
+    { label: "Cupons vendidos", value: counts.vendas, href: "/dashboard/beneficios", icon: ShoppingBag },
+    { label: "Cupons utilizados", value: counts.usados, href: "/dashboard/beneficios", icon: Ticket },
+    {
+      label: "Faturamento (teste)",
+      value: counts.faturamento,
+      money: true,
+      href: "/dashboard/beneficios",
+      icon: Wallet,
+    },
   ];
 
   return (
@@ -61,7 +80,7 @@ export default async function DashboardPage() {
 
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((card) => (
-          <a
+          <Link
             key={card.label}
             href={card.href}
             className={`group flex items-start justify-between rounded-xl border p-5 transition hover:-translate-y-0.5 hover:shadow-md ${
@@ -73,7 +92,7 @@ export default async function DashboardPage() {
             <div>
               <p className="text-sm text-[#5c6e6f]">{card.label}</p>
               <p className="mt-2 font-head text-3xl font-bold text-[#263f40]">
-                {card.value}
+                {card.money ? `R$ ${card.value.toFixed(2).replace(".", ",")}` : card.value}
               </p>
             </div>
             <span
@@ -85,7 +104,7 @@ export default async function DashboardPage() {
             >
               <card.icon size={20} strokeWidth={2} />
             </span>
-          </a>
+          </Link>
         ))}
       </div>
     </div>

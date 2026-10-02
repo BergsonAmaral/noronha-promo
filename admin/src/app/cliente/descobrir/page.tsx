@@ -46,6 +46,9 @@ export default async function DescobrirPage() {
       <p className="mt-1 mb-5 text-sm text-[#5c6e6f]">
         Passeios, hospedagens e experiências com desconto do clube.
       </p>
+      <p className="mb-4 rounded-lg bg-[#df9c28]/10 px-3 py-2 text-xs text-[#8a5f0f]">
+        Modo de teste: o botão Comprar libera o cupom na hora, sem cobrança.
+      </p>
       <DescobrirList categorias={categorias ?? []} itens={itens} />
     </div>
   );

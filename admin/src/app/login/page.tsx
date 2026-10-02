@@ -70,7 +70,7 @@ export default async function LoginPage({
               <p className="font-[family-name:var(--font-manrope)] text-xl font-bold text-[#263f40]">
                 Noronha <span className="text-[#df9c28]">Promo</span>
               </p>
-              <p className="text-xs text-[#5c6e6f]">Painel administrativo</p>
+              <p className="text-xs text-[#5c6e6f]">Clube de descontos</p>
             </div>
           </div>
 
@@ -79,7 +79,7 @@ export default async function LoginPage({
               Entrar
             </h2>
             <p className="mt-1 text-sm text-[#5c6e6f]">
-              Acesse com seu e-mail e senha de administrador.
+              Clientes, parceiros e equipe entram por aqui.
             </p>
 
             <form action={signIn} className="mt-6 flex flex-col gap-4">
@@ -121,6 +121,13 @@ export default async function LoginPage({
                 </p>
               )}
 
+              <Link
+                href="/login/esqueci"
+                className="-mt-1 self-end text-xs font-semibold text-[#48696c] hover:underline"
+              >
+                Esqueci minha senha
+              </Link>
+
               <button
                 type="submit"
                 className="mt-2 rounded-lg bg-[#df9c28] px-4 py-2.5 text-sm font-semibold text-[#263f40] shadow-sm transition hover:bg-[#c78716] hover:shadow-md"
@@ -131,7 +138,7 @@ export default async function LoginPage({
           </div>
 
           <p className="mt-6 text-center text-xs text-[#5c6e6f]">
-            É cliente e ainda não tem conta?{" "}
+            Ainda não tem conta?{" "}
             <Link href="/login/cadastro" className="font-semibold text-[#48696c] hover:underline">
               Criar conta
             </Link>

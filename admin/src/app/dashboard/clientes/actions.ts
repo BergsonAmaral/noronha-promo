@@ -32,7 +32,7 @@ export async function criarCliente(
     email: email.trim(),
     password: senha,
     email_confirm: true,
-    user_metadata: { nome: nome.trim(), role: "cliente" },
+    user_metadata: { nome: nome.trim() },
   });
   if (error) return { error: error.message };
 
