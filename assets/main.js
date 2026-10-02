@@ -312,6 +312,64 @@ async function carregarBeneficios() {
 
 const beneficiosCarregados = carregarBeneficios();
 
+// Diretório de parceiros aprovados (mesmo sem benefício publicado ainda).
+const parceirosGrid = document.getElementById("parceiros-grid");
+const parceirosStatus = document.getElementById("parceiros-status");
+
+function renderParceiros(lista) {
+  if (!parceirosGrid) return;
+
+  if (!lista.length) {
+    parceirosGrid.innerHTML = "";
+    parceirosStatus.textContent = "Em breve, novos parceiros por aqui.";
+    parceirosStatus.className = "parceiros-status is-empty";
+    return;
+  }
+
+  parceirosStatus.textContent = "";
+  parceirosStatus.className = "parceiros-status";
+  parceirosGrid.innerHTML = lista
+    .map((p) => {
+      const categoria = p.categorias;
+      const logo = p.logo_url
+        ? `style="background-image:url('${p.logo_url}')"`
+        : "";
+      return `
+        <article class="parceiro-card">
+          <span class="parceiro-logo" ${logo}>
+            ${p.logo_url ? "" : `<i data-lucide="${categoria?.icone || "store"}" data-size="22"></i>`}
+          </span>
+          <div class="parceiro-info">
+            <h3>${p.nome_negocio}</h3>
+            ${categoria ? `<span class="parceiro-cat"><i data-lucide="${categoria.icone || "store"}" data-size="12"></i> ${categoria.nome}</span>` : ""}
+            ${p.descricao ? `<p class="desc">${p.descricao}</p>` : ""}
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+  renderIcons(parceirosGrid);
+}
+
+async function carregarParceiros() {
+  if (!parceirosGrid) return;
+  const { data, error } = await sb
+    .from("parceiros")
+    .select("nome_negocio, descricao, logo_url, categorias(nome, icone)")
+    .eq("status", "aprovado")
+    .order("nome_negocio");
+
+  if (error) {
+    parceirosStatus.textContent = "Não foi possível carregar os parceiros agora.";
+    parceirosStatus.className = "parceiros-status is-error";
+    return;
+  }
+
+  renderParceiros(data || []);
+}
+
+carregarParceiros();
+
 function filtrarEMostrar(categoria) {
   const filtrados =
     !categoria || categoria === "todas"
