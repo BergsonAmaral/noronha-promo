@@ -65,6 +65,7 @@ export async function atualizarStatusParceiro(id: string, status: ParceiroStatus
   const supabase = await createClient();
   await supabase.from("parceiros").update({ status }).eq("id", id);
   revalidatePath("/dashboard/parceiros");
+  revalidatePath("/dashboard/leads");
 }
 
 export async function criarParceiro(formData: FormData) {

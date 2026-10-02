@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import type { Parceiro, Categoria, ParceiroStatus } from "@/lib/supabase/types";
 import { atualizarStatusParceiro, criarParceiro, excluirParceiro } from "./actions";
@@ -50,7 +51,7 @@ export default async function ParceirosPage({
         </div>
         <div className="flex gap-2 text-sm">
           {["", "pendente", "aprovado", "rejeitado", "inativo"].map((s) => (
-            <a
+            <Link
               key={s || "todos"}
               href={s ? `/dashboard/parceiros?status=${s}` : "/dashboard/parceiros"}
               className={`rounded-lg px-3 py-1.5 font-medium ${
@@ -60,7 +61,7 @@ export default async function ParceirosPage({
               }`}
             >
               {s ? STATUS_LABEL[s as ParceiroStatus] : "Todos"}
-            </a>
+            </Link>
           ))}
         </div>
       </div>
