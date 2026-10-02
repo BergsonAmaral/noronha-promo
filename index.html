@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@500;600;700;800&family=Fraunces:ital,wght@1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=5" />
+<link rel="stylesheet" href="assets/style.css?v=6" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
@@ -127,29 +127,15 @@
     </div>
   </section>
 
-  <!-- CAMINHOS / CATEGORIAS DESTAQUE -->
-  <section class="section caminhos">
+  <!-- CUPONS (destaque + busca fundidos) -->
+  <section class="section caminhos" id="beneficios">
     <img class="caminhos-backdrop" src="assets/img/noronha-hero.jpg" alt="" aria-hidden="true" />
     <div class="container caminhos-inner">
       <span class="eyebrow eyebrow-light center" data-reveal>Do primeiro passeio ao último pôr do sol</span>
       <h2 class="center" data-reveal>Encontre a sua forma<br /><em>de viver Noronha.</em></h2>
       <p class="lead center lead-invert" data-reveal>Escolha o que combina com você. Estamos formando a rede de parceiros para transformar seus planos em benefícios.</p>
 
-      <div id="cupons-destaque" class="cupons-destaque-grid" aria-live="polite"></div>
-      <p id="cupons-destaque-status" class="beneficios-status beneficios-status-invert">Carregando cupons...</p>
-
-      <div class="center" style="margin-top:2rem">
-        <a href="#beneficios" class="btn btn-outline btn-outline-invert" data-categoria="todas">Ver todos os cupons <i data-lucide="arrow-right" data-size="16"></i></a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BUSCA DE BENEFÍCIOS -->
-  <section class="section busca" id="beneficios">
-    <div class="container busca-box" data-reveal>
-      <h2>O que você quer viver em Noronha?</h2>
-      <p>Encontre benefícios para o seu próximo roteiro.</p>
-      <form class="busca-form" id="form-busca">
+      <form class="busca-form" id="form-busca" data-reveal>
         <label for="categoria">Escolha uma categoria</label>
         <select id="categoria" name="categoria">
           <option value="todas">Todas as experiências</option>
@@ -170,57 +156,9 @@
         </select>
         <button type="submit" class="btn btn-gold"><i data-lucide="search" data-size="16"></i> Buscar benefícios</button>
       </form>
-    </div>
 
-    <div class="container beneficios-wrap">
-      <div id="beneficios-grid" class="beneficios-grid" aria-live="polite"></div>
-      <p id="beneficios-status" class="beneficios-status">Carregando benefícios...</p>
-    </div>
-  </section>
-
-  <!-- CATEGORIAS -->
-  <section class="section categorias">
-    <div class="container">
-      <div class="section-head" data-reveal>
-        <div>
-          <span class="eyebrow eyebrow-dark">O clube acompanha a sua viagem</span>
-          <h2>Da hospedagem à aventura.<br /><em>Tem uma categoria para você.</em></h2>
-        </div>
-        <a href="#beneficios" class="btn btn-outline" data-categoria="todas">Ver todas <i data-lucide="arrow-up-right" data-size="16"></i></a>
-      </div>
-
-      <div class="categorias-grid">
-        <a href="#beneficios" class="categoria-card" data-categoria="hospedagem" data-reveal>
-          <i data-lucide="bed-double" data-size="29" class="cat-icon"></i>
-          <h3>Hospedagem</h3><p>Um lugar para chamar de seu.</p>
-          <i data-lucide="arrow-up-right" data-size="16" class="cat-arrow"></i>
-        </a>
-        <a href="#beneficios" class="categoria-card" data-categoria="gastronomia" data-reveal>
-          <i data-lucide="utensils" data-size="29" class="cat-icon"></i>
-          <h3>Gastronomia</h3><p>Sabores que também fazem a viagem.</p>
-          <i data-lucide="arrow-up-right" data-size="16" class="cat-arrow"></i>
-        </a>
-        <a href="#beneficios" class="categoria-card" data-categoria="passeios" data-reveal>
-          <i data-lucide="compass" data-size="29" class="cat-icon"></i>
-          <h3>Passeios</h3><p>Novas perspectivas da ilha.</p>
-          <i data-lucide="arrow-up-right" data-size="16" class="cat-arrow"></i>
-        </a>
-        <a href="#beneficios" class="categoria-card" data-categoria="mergulho" data-reveal>
-          <i data-lucide="waves" data-size="29" class="cat-icon"></i>
-          <h3>Mergulho</h3><p>Outro mundo, logo ali embaixo.</p>
-          <i data-lucide="arrow-up-right" data-size="16" class="cat-arrow"></i>
-        </a>
-        <a href="#beneficios" class="categoria-card" data-categoria="mobilidade" data-reveal>
-          <i data-lucide="car" data-size="29" class="cat-icon"></i>
-          <h3>Carros e buggys</h3><p>Mais liberdade para explorar.</p>
-          <i data-lucide="arrow-up-right" data-size="16" class="cat-arrow"></i>
-        </a>
-        <a href="#beneficios" class="categoria-card" data-categoria="equipamentos" data-reveal>
-          <i data-lucide="camera" data-size="29" class="cat-icon"></i>
-          <h3>Equipamentos</h3><p>Tudo pronto para a aventura.</p>
-          <i data-lucide="arrow-up-right" data-size="16" class="cat-arrow"></i>
-        </a>
-      </div>
+      <div id="beneficios-grid" class="cupons-destaque-grid" aria-live="polite"></div>
+      <p id="beneficios-status" class="beneficios-status beneficios-status-invert">Carregando cupons...</p>
     </div>
   </section>
 
@@ -485,7 +423,7 @@
 
     <div>
       <h4>Explore</h4>
-      <a href="#beneficios">Benefícios e categorias</a>
+      <a href="#beneficios">Benefícios</a>
       <a href="#guia">Guia de Noronha</a>
       <a href="#clube">Faça parte do clube</a>
     </div>
@@ -515,7 +453,7 @@
   <i data-lucide="chevron-down" data-size="20" class="icon-rotate-180"></i>
 </button>
 
-<script src="assets/supabase-client.js?v=5"></script>
-<script src="assets/main.js?v=5"></script>
+<script src="assets/supabase-client.js?v=6"></script>
+<script src="assets/main.js?v=6"></script>
 </body>
 </html>

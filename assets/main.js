@@ -200,41 +200,7 @@ function imagemHtml(b, alt) {
   return `<div class="cupom-foto" style="background-image:url('${b.imagem_url}')" role="img" aria-label="${alt}"></div>`;
 }
 
-function renderBeneficios(lista) {
-  if (!beneficiosGrid) return;
-
-  if (!lista.length) {
-    beneficiosGrid.innerHTML = "";
-    beneficiosStatus.textContent = "Nenhum benefício encontrado nessa categoria ainda.";
-    beneficiosStatus.className = "beneficios-status is-empty";
-    return;
-  }
-
-  beneficiosStatus.textContent = "";
-  beneficiosStatus.className = "beneficios-status";
-  beneficiosGrid.innerHTML = lista
-    .map((b) => {
-      const categoria = b.categorias;
-      const parceiro = b.parceiros;
-      const badge = formatBadge(b);
-      return `
-        <article class="beneficio-card">
-          ${imagemHtml(b, b.titulo)}
-          ${badge ? `<span class="cupom-badge">${badge}</span>` : ""}
-          <span class="cat-tag"><i data-lucide="${categoria?.icone || "compass"}" data-size="14"></i> ${categoria?.nome || "Geral"}</span>
-          <h3>${b.titulo}</h3>
-          <p class="parceiro">${parceiro?.nome_negocio || "Noronha Promo"}</p>
-          ${precoComDescontoHtml(b)}
-          <p class="preco">${formatPreco(b.preco)} <span class="preco-label-inline">o cupom</span></p>
-          <a class="cta" href="/portal/login/cadastro">Criar conta para aproveitar <i data-lucide="arrow-right" data-size="14"></i></a>
-        </article>
-      `;
-    })
-    .join("");
-  renderIcons(beneficiosGrid);
-}
-
-// Selo compacto de desconto (ex: "-20%" ou "-R$10") pro card de destaque.
+// Selo compacto de desconto (ex: "-20%" ou "-R$10").
 function formatBadge(b) {
   if (!b.valor_desconto) return null;
   if (b.tipo_desconto === "percentual") return `-${b.valor_desconto}%`;
@@ -243,30 +209,25 @@ function formatBadge(b) {
   return null;
 }
 
-const cuponsDestaqueGrid = document.getElementById("cupons-destaque");
-const cuponsDestaqueStatus = document.getElementById("cupons-destaque-status");
+function renderBeneficios(lista) {
+  if (!beneficiosGrid) return;
 
-function renderCuponsDestaque(lista) {
-  if (!cuponsDestaqueGrid) return;
-
-  const destaques = lista.slice(0, 6);
-
-  if (!destaques.length) {
-    cuponsDestaqueGrid.innerHTML = "";
-    cuponsDestaqueStatus.textContent = "Os primeiros cupons do clube chegam em breve.";
-    cuponsDestaqueStatus.className = "beneficios-status beneficios-status-invert is-empty";
+  if (!lista.length) {
+    beneficiosGrid.innerHTML = "";
+    beneficiosStatus.textContent = "Nenhum benefício encontrado nessa categoria ainda.";
+    beneficiosStatus.className = "beneficios-status beneficios-status-invert is-empty";
     return;
   }
 
-  cuponsDestaqueStatus.textContent = "";
-  cuponsDestaqueStatus.className = "beneficios-status beneficios-status-invert";
-  cuponsDestaqueGrid.innerHTML = destaques
+  beneficiosStatus.textContent = "";
+  beneficiosStatus.className = "beneficios-status beneficios-status-invert";
+  beneficiosGrid.innerHTML = lista
     .map((b) => {
       const categoria = b.categorias;
       const parceiro = b.parceiros;
       const badge = formatBadge(b);
       return `
-        <article class="cupom-card ${b.imagem_url ? "tem-foto" : ""}">
+        <article class="cupom-card">
           ${imagemHtml(b, b.titulo)}
           ${badge ? `<span class="cupom-badge">${badge}</span>` : ""}
           <span class="cupom-cat"><i data-lucide="${categoria?.icone || "compass"}" data-size="14"></i> ${categoria?.nome || "Geral"}</span>
@@ -282,11 +243,11 @@ function renderCuponsDestaque(lista) {
       `;
     })
     .join("");
-  renderIcons(cuponsDestaqueGrid);
+  renderIcons(beneficiosGrid);
 }
 
 async function carregarBeneficios() {
-  if (!beneficiosGrid && !cuponsDestaqueGrid) return;
+  if (!beneficiosGrid) return;
   const { data, error } = await sb
     .from("beneficios")
     .select("*, categorias(nome, icone, slug), parceiros(nome_negocio)")
@@ -294,23 +255,16 @@ async function carregarBeneficios() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    if (beneficiosStatus) {
-      beneficiosStatus.textContent = "Não foi possível carregar os benefícios agora.";
-      beneficiosStatus.className = "beneficios-status is-error";
-    }
-    if (cuponsDestaqueStatus) {
-      cuponsDestaqueStatus.textContent = "Não foi possível carregar os cupons agora.";
-      cuponsDestaqueStatus.className = "beneficios-status beneficios-status-invert is-error";
-    }
+    beneficiosStatus.textContent = "Não foi possível carregar os benefícios agora.";
+    beneficiosStatus.className = "beneficios-status beneficios-status-invert is-error";
     return;
   }
 
   todosBeneficios = data || [];
   renderBeneficios(todosBeneficios);
-  renderCuponsDestaque(todosBeneficios);
 }
 
-const beneficiosCarregados = carregarBeneficios();
+carregarBeneficios();
 
 // Diretório de parceiros aprovados (mesmo sem benefício publicado ainda).
 const parceirosGrid = document.getElementById("parceiros-grid");
@@ -386,20 +340,6 @@ if (formBusca) {
     filtrarEMostrar(document.getElementById("categoria").value);
   });
 }
-
-// Cards de destaque ("Descubra novos caminhos" etc.) levam direto para os
-// cupons já filtrados pela categoria daquele card, em vez de mostrar tudo.
-document.querySelectorAll("[data-categoria]").forEach((el) => {
-  el.addEventListener("click", async (e) => {
-    const categoria = el.getAttribute("data-categoria");
-    if (!categoria) return;
-    e.preventDefault();
-    await beneficiosCarregados;
-    const select = document.getElementById("categoria");
-    if (select) select.value = categoria;
-    filtrarEMostrar(categoria);
-  });
-});
 
 // Lista de interesse (captura de leads)
 const formLista = document.getElementById("form-lista");
