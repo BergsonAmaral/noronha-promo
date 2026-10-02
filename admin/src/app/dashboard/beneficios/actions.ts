@@ -54,7 +54,15 @@ export async function criarBeneficio(formData: FormData) {
 
 export async function excluirBeneficio(id: string) {
   const supabase = await createClient();
-  await supabase.from("beneficios").delete().eq("id", id);
+  const { count } = await supabase
+    .from("resgates")
+    .select("id", { count: "exact", head: true })
+    .eq("beneficio_id", id);
+  if (count) {
+    await supabase.from("beneficios").update({ status: "pausado" }).eq("id", id);
+  } else {
+    await supabase.from("beneficios").delete().eq("id", id);
+  }
   revalidatePath("/dashboard/beneficios");
 }
 

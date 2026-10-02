@@ -1,5 +1,6 @@
 "use client";
 
+import { formatPreco, formatDesconto, valorComDesconto } from "@/lib/format";
 import { useMemo, useState, useTransition } from "react";
 import { Search, Tag, ShoppingBag, Check } from "lucide-react";
 import { getIcon } from "@/lib/icon-map";
@@ -28,30 +29,6 @@ export interface DescobrirItem {
   categoriaIcone: string;
   restantes: number | null;
   bloqueio: string | null;
-}
-
-function formatDesconto(item: DescobrirItem) {
-  if (!item.valor_desconto) return item.condicoes ?? "Benefício especial";
-  if (item.tipo_desconto === "percentual") return `${item.valor_desconto}% off`;
-  if (item.tipo_desconto === "valor_fixo")
-    return `R$ ${item.valor_desconto.toFixed(2).replace(".", ",")} off`;
-  return item.condicoes ?? "Benefício especial";
-}
-
-function formatPreco(preco: number) {
-  return preco > 0 ? `R$ ${preco.toFixed(2).replace(".", ",")}` : "Grátis";
-}
-
-function valorComDesconto(item: DescobrirItem) {
-  if (!item.valor_original) return null;
-  let final: number | null = null;
-  if (item.tipo_desconto === "percentual" && item.valor_desconto) {
-    final = item.valor_original * (1 - item.valor_desconto / 100);
-  } else if (item.tipo_desconto === "valor_fixo" && item.valor_desconto) {
-    final = item.valor_original - item.valor_desconto;
-  }
-  if (final == null || final < 0) return null;
-  return { original: item.valor_original, final };
 }
 
 export function DescobrirList({

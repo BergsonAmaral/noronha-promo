@@ -115,9 +115,12 @@ export default async function LoginPage({
 
               {error && (
                 <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
-                  {error === "Acesso restrito ao time administrativo"
+                  {error === "Acesso restrito ao time administrativo" ||
+                  error === "Link inválido ou expirado"
                     ? error
-                    : "E-mail ou senha inválidos."}
+                    : /not confirmed/i.test(error)
+                      ? "Confirme seu e-mail antes de entrar. Não recebeu? Use “Esqueci minha senha”."
+                      : "E-mail ou senha inválidos."}
                 </p>
               )}
 

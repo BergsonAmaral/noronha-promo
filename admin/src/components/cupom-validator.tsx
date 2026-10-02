@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDesconto } from "@/lib/format";
 import { useState, useTransition } from "react";
 import { QrScanner } from "@/components/qr-scanner";
 import { consultarCupom, usarCupom, type CupomInfo } from "@/app/parceiro/actions";
@@ -20,14 +21,6 @@ const STATUS_LABEL: Record<CupomInfo["status"], string> = {
   expirado: "Expirado",
   cancelado: "Cancelado",
 };
-
-function formatDesconto(c: CupomInfo) {
-  if (!c.valor_desconto) return "";
-  if (c.tipo_desconto === "percentual") return `${c.valor_desconto}% de desconto`;
-  if (c.tipo_desconto === "valor_fixo")
-    return `R$ ${c.valor_desconto.toFixed(2).replace(".", ",")} de desconto`;
-  return "";
-}
 
 export function CupomValidator() {
   const [codigo, setCodigo] = useState("");
@@ -145,8 +138,8 @@ export function CupomValidator() {
             <h3 className="font-head text-lg font-bold text-[#263f40]">
               {cupom.beneficio_titulo}
             </h3>
-            {formatDesconto(cupom) && (
-              <p className="text-sm text-[#5c6e6f]">{formatDesconto(cupom)}</p>
+            {formatDesconto(cupom, "de desconto", "") && (
+              <p className="text-sm text-[#5c6e6f]">{formatDesconto(cupom, "de desconto", "")}</p>
             )}
           </div>
 

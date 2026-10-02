@@ -93,6 +93,15 @@ export async function criarParceiro(formData: FormData) {
 
 export async function excluirParceiro(id: string) {
   const supabase = await createClient();
-  await supabase.from("parceiros").delete().eq("id", id);
+  const { data: bens } = await supabase.from("beneficios").select("id").eq("parceiro_id", id);
+  const ids = (bens ?? []).map((b) => b.id);
+  const { count } = ids.length
+    ? await supabase.from("resgates").select("id", { count: "exact", head: true }).in("beneficio_id", ids)
+    : { count: 0 };
+  if (count) {
+    await supabase.from("parceiros").update({ status: "inativo" }).eq("id", id);
+  } else {
+    await supabase.from("parceiros").delete().eq("id", id);
+  }
   revalidatePath("/dashboard/parceiros");
 }

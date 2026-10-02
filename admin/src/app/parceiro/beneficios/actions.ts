@@ -75,6 +75,14 @@ export async function excluirBeneficio(id: string) {
   const { supabase, parceiroId } = await exigirParceiro();
   if (!parceiroId) return;
 
-  await supabase.from("beneficios").delete().eq("id", id).eq("parceiro_id", parceiroId);
+  const { count } = await supabase
+    .from("resgates")
+    .select("id", { count: "exact", head: true })
+    .eq("beneficio_id", id);
+  if (count) {
+    await supabase.from("beneficios").update({ status: "pausado" }).eq("id", id).eq("parceiro_id", parceiroId);
+  } else {
+    await supabase.from("beneficios").delete().eq("id", id).eq("parceiro_id", parceiroId);
+  }
   revalidatePath("/parceiro/beneficios");
 }

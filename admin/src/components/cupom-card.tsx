@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDesconto } from "@/lib/format";
 import { useState } from "react";
 import { CupomQrModal } from "./cupom-qr-modal";
 import { AvaliarModal } from "./avaliar-modal";
@@ -19,14 +20,6 @@ export interface CupomCardData {
   utilizado: boolean;
   utilizadoEm: string | null;
   avaliado: boolean;
-}
-
-function formatDesconto(c: CupomCardData) {
-  if (!c.valor_desconto) return c.condicoes ?? "Benefício especial";
-  if (c.tipo_desconto === "percentual") return `${c.valor_desconto}% de desconto`;
-  if (c.tipo_desconto === "valor_fixo")
-    return `R$ ${c.valor_desconto.toFixed(2).replace(".", ",")} de desconto`;
-  return c.condicoes ?? "Benefício especial";
 }
 
 export function CupomCard({ cupom }: { cupom: CupomCardData }) {
@@ -56,7 +49,7 @@ export function CupomCard({ cupom }: { cupom: CupomCardData }) {
           </h3>
           <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-[#48696c]">
             <Tag size={14} strokeWidth={2.5} />
-            {formatDesconto(cupom)}
+            {formatDesconto(cupom, "de desconto")}
           </p>
         </div>
 

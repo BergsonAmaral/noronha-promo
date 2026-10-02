@@ -1,3 +1,4 @@
+import { formatMoeda, formatDesconto } from "@/lib/format";
 import { ImageUpload } from "@/components/image-upload";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -14,18 +15,6 @@ const STATUS_COLOR = {
   pausado: "bg-amber-50 text-amber-700",
   expirado: "bg-[#f7f8f8] text-[#5c6e6f]",
 };
-
-function formatMoeda(v: number) {
-  return `R$ ${v.toFixed(2).replace(".", ",")}`;
-}
-
-function formatDesconto(b: Beneficio) {
-  if (!b.valor_desconto) return b.condicoes ?? "—";
-  if (b.tipo_desconto === "percentual") return `${b.valor_desconto}% off`;
-  if (b.tipo_desconto === "valor_fixo")
-    return `R$ ${b.valor_desconto.toFixed(2).replace(".", ",")} off`;
-  return b.condicoes ?? "—";
-}
 
 export default async function BeneficiosParceiroPage() {
   const supabase = await createClient();
@@ -270,7 +259,7 @@ export default async function BeneficiosParceiroPage() {
                   <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#5c6e6f]">
                     <span className="flex items-center gap-1 font-medium text-[#48696c]">
                       <Tag size={12} strokeWidth={2.5} />
-                      {formatDesconto(b)}
+                      {formatDesconto(b, "off", "—")}
                     </span>
                     <span>{b.preco > 0 ? formatMoeda(b.preco) : "Grátis"}</span>
                     <span>{vendidos(b)} vendido(s)</span>

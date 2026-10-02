@@ -1,3 +1,4 @@
+import { formatPreco, formatDesconto, textoDePor } from "@/lib/format";
 import { ImageUpload } from "@/components/image-upload";
 import { createClient } from "@/lib/supabase/server";
 import type { Beneficio, Parceiro, Categoria } from "@/lib/supabase/types";
@@ -10,30 +11,6 @@ const STATUS_COLOR = {
   pausado: "bg-amber-50 text-amber-700",
   expirado: "bg-[#f7f8f8] text-[#5c6e6f]",
 };
-
-function formatPreco(v: number) {
-  return v > 0 ? `R$ ${v.toFixed(2).replace(".", ",")}` : "Gratuito";
-}
-
-function formatDesconto(b: Beneficio) {
-  if (!b.valor_desconto) return b.condicoes ?? "—";
-  if (b.tipo_desconto === "percentual") return `${b.valor_desconto}% off`;
-  if (b.tipo_desconto === "valor_fixo")
-    return `R$ ${b.valor_desconto.toFixed(2).replace(".", ",")} off`;
-  return b.condicoes ?? "—";
-}
-
-function formatValorComDesconto(b: Beneficio) {
-  if (!b.valor_original) return null;
-  const final =
-    b.tipo_desconto === "percentual" && b.valor_desconto
-      ? b.valor_original * (1 - b.valor_desconto / 100)
-      : b.tipo_desconto === "valor_fixo" && b.valor_desconto
-        ? b.valor_original - b.valor_desconto
-        : null;
-  if (final == null) return null;
-  return `De ${formatPreco(b.valor_original)} por ${formatPreco(final)}`;
-}
 
 export default async function BeneficiosPage() {
   const supabase = await createClient();
@@ -252,11 +229,11 @@ export default async function BeneficiosPage() {
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-[#5c6e6f]">
-                    {b.parceiros?.nome_negocio ?? "Sem parceiro"} · {formatDesconto(b)}
+                    {b.parceiros?.nome_negocio ?? "Sem parceiro"} · {formatDesconto(b, "off", "—")}
                   </p>
-                  {formatValorComDesconto(b) && (
+                  {textoDePor(b) && (
                     <p className="mt-0.5 text-sm font-medium text-[#48696c]">
-                      {formatValorComDesconto(b)}
+                      {textoDePor(b)}
                     </p>
                   )}
                   <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#5c6e6f]">

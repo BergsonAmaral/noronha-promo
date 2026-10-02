@@ -252,6 +252,7 @@ async function carregarBeneficios() {
     .from("beneficios")
     .select("*, categorias(nome, icone, slug), parceiros(nome_negocio)")
     .eq("status", "ativo")
+    .or(`validade_fim.is.null,validade_fim.gte.${new Date().toISOString().slice(0, 10)}`)
     .order("created_at", { ascending: false });
 
   if (error) {
