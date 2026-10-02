@@ -62,6 +62,7 @@ export interface Beneficio {
   validade_inicio: string | null;
   validade_fim: string | null;
   limite_resgates: number | null;
+  limite_por_cliente: number | null;
   status: BeneficioStatus;
   created_at: string;
   updated_at: string;

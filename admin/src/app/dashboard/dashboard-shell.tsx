@@ -22,9 +22,11 @@ const NAV = [
 
 export function DashboardShell({
   profile,
+  mensagensNaoLidas = 0,
   children,
 }: {
   profile: Profile;
+  mensagensNaoLidas?: number;
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -70,7 +72,12 @@ export function DashboardShell({
 
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 pt-2">
           {NAV.map((item) => (
-            <NavLink key={item.href} href={item.href} icon={item.icon}>
+            <NavLink
+              key={item.href}
+              href={item.href}
+              icon={item.icon}
+              badge={item.href === "/dashboard/mensagens" ? mensagensNaoLidas : 0}
+            >
               {item.label}
             </NavLink>
           ))}

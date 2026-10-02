@@ -10,7 +10,7 @@ type BeneficioComDetalhes = Beneficio & {
 export default async function DescobrirPage() {
   const supabase = await createClient();
 
-  const [{ data: beneficios }, { data: categorias }] = await Promise.all([
+  const [{ data: beneficios }, { data: categorias }, { data: contagens }] = await Promise.all([
     supabase
       .from("beneficios")
       .select("*, categorias(nome, icone), parceiros(nome_negocio)")
@@ -23,9 +23,30 @@ export default async function DescobrirPage() {
       .eq("ativo", true)
       .order("ordem")
       .returns<CategoriaChip[]>(),
+    supabase.rpc("contagem_resgates"),
   ]);
 
-  const itens: DescobrirItem[] = (beneficios ?? []).map((b) => ({
+  const contagem = new Map(
+    ((contagens ?? []) as { beneficio_id: string; vendidos: number; meus: number }[]).map((c) => [
+      c.beneficio_id,
+      c,
+    ])
+  );
+
+  const itens: DescobrirItem[] = (beneficios ?? [])
+    .filter((b) => !b.validade_fim || b.validade_fim >= new Date().toISOString().slice(0, 10))
+    .map((b) => {
+    const c = contagem.get(b.id);
+    const vendidos = Number(c?.vendidos ?? 0);
+    const meus = Number(c?.meus ?? 0);
+    const restantes = b.limite_resgates != null ? Math.max(b.limite_resgates - vendidos, 0) : null;
+    const bloqueio =
+      restantes === 0
+        ? "Esgotado"
+        : b.limite_por_cliente != null && meus >= b.limite_por_cliente
+          ? "Limite atingido"
+          : null;
+    return {
     id: b.id,
     titulo: b.titulo,
     condicoes: b.condicoes,
@@ -38,7 +59,10 @@ export default async function DescobrirPage() {
     categoriaId: b.categoria_id,
     categoriaNome: b.categorias?.nome ?? "Geral",
     categoriaIcone: b.categorias?.icone ?? "compass",
-  }));
+    restantes,
+    bloqueio,
+    };
+  });
 
   return (
     <div>

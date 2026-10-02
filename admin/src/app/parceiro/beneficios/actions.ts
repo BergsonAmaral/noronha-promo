@@ -37,6 +37,8 @@ export async function criarBeneficio(formData: FormData) {
   const preco = Number(formData.get("preco") ?? 0);
   const condicoes = String(formData.get("condicoes") ?? "").trim();
   const imagem_url = String(formData.get("imagem_url") ?? "").trim();
+  const limite_resgates = formData.get("limite_resgates") ? Number(formData.get("limite_resgates")) : null;
+  const limite_por_cliente = formData.get("limite_por_cliente") ? Number(formData.get("limite_por_cliente")) : null;
   const validade_fim = String(formData.get("validade_fim") ?? "") || null;
 
   if (!titulo) return;
@@ -53,6 +55,8 @@ export async function criarBeneficio(formData: FormData) {
     condicoes: condicoes || null,
     imagem_url: imagem_url || null,
     validade_fim,
+    limite_resgates,
+    limite_por_cliente,
     status: "ativo",
   });
 

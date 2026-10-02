@@ -25,5 +25,15 @@ export default async function DashboardLayout({
     redirect("/login?error=Acesso restrito ao time administrativo");
   }
 
-  return <DashboardShell profile={profile}>{children}</DashboardShell>;
+  const { count: mensagensNaoLidas } = await supabase
+    .from("mensagens")
+    .select("id", { count: "exact", head: true })
+    .neq("remetente_role", "admin")
+    .eq("lida", false);
+
+  return (
+    <DashboardShell profile={profile} mensagensNaoLidas={mensagensNaoLidas ?? 0}>
+      {children}
+    </DashboardShell>
+  );
 }

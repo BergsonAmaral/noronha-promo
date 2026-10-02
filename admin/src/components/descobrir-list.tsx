@@ -26,6 +26,8 @@ export interface DescobrirItem {
   categoriaId: string | null;
   categoriaNome: string;
   categoriaIcone: string;
+  restantes: number | null;
+  bloqueio: string | null;
 }
 
 function formatDesconto(item: DescobrirItem) {
@@ -196,11 +198,16 @@ export function DescobrirList({
                     {formatPreco(item.preco)} <span>o cupom</span>
                   </p>
 
+                  {item.restantes !== null && !item.bloqueio && item.restantes <= 10 && (
+                    <p className="mt-1 text-xs font-medium text-[#b9770e]">
+                      {item.restantes === 1 ? "Resta 1 cupom" : `Restam ${item.restantes} cupons`}
+                    </p>
+                  )}
                   {erro && <p className="mt-1.5 text-xs text-[#b3261e]">{erro}</p>}
 
                   <button
                     onClick={() => (comprado ? setCupomComprado(null) : comprar(item))}
-                    disabled={isPending && comprandoId === item.id}
+                    disabled={(isPending && comprandoId === item.id) || (!!item.bloqueio && !comprado)}
                     className={`mt-3 flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold transition disabled:opacity-60 ${
                       comprado
                         ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
@@ -212,6 +219,8 @@ export function DescobrirList({
                         <Check size={13} strokeWidth={2.5} />
                         Comprado
                       </>
+                    ) : item.bloqueio ? (
+                      <>{item.bloqueio}</>
                     ) : (
                       <>
                         <ShoppingBag size={13} strokeWidth={2.5} />

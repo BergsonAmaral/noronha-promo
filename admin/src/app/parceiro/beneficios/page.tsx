@@ -1,3 +1,4 @@
+import { ImageUpload } from "@/components/image-upload";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import type { Beneficio, Categoria, Parceiro, Resgate } from "@/lib/supabase/types";
@@ -201,11 +202,27 @@ export default async function BeneficiosParceiroPage() {
             />
           </div>
 
-          <div className="flex flex-col gap-1 sm:col-span-2">
-            <label className="text-xs font-medium text-[#5c6e6f]">Foto (URL)</label>
+          <div className="sm:col-span-2">
+            <ImageUpload name="imagem_url" label="Foto do cupom" />
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-[#5c6e6f]">Quantidade disponível (opcional)</label>
             <input
-              name="imagem_url"
-              placeholder="https://..."
+              name="limite_resgates"
+              type="number"
+              min="1"
+              placeholder="Ilimitado"
+              className="rounded-lg border border-[#e7e2d6] px-3 py-2 text-sm text-[#263f40] outline-none focus:border-[#48696c]"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-[#5c6e6f]">Limite por cliente (opcional)</label>
+            <input
+              name="limite_por_cliente"
+              type="number"
+              min="1"
+              placeholder="Sem limite"
               className="rounded-lg border border-[#e7e2d6] px-3 py-2 text-sm text-[#263f40] outline-none focus:border-[#48696c]"
             />
           </div>

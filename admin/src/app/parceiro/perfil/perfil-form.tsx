@@ -3,6 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import { atualizarPerfilParceiro } from "./actions";
 import type { Categoria, Parceiro } from "@/lib/supabase/types";
+import { ImageUpload } from "@/components/image-upload";
 import { Check, Save } from "lucide-react";
 
 export function PerfilForm({
@@ -109,15 +110,7 @@ export function PerfilForm({
             className="rounded-lg border border-[#e7e2d6] px-3 py-2 text-sm text-[#263f40] outline-none focus:border-[#48696c]"
           />
         </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-[#5c6e6f]">Logo (URL)</label>
-          <input
-            name="logo_url"
-            placeholder="https://..."
-            defaultValue={parceiro.logo_url ?? ""}
-            className="rounded-lg border border-[#e7e2d6] px-3 py-2 text-sm text-[#263f40] outline-none focus:border-[#48696c]"
-          />
-        </div>
+        <ImageUpload name="logo_url" label="Logo" defaultValue={parceiro.logo_url ?? ""} />
       </div>
 
       <div className="flex flex-col gap-1">

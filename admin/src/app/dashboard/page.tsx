@@ -107,6 +107,21 @@ export default async function DashboardPage() {
           </Link>
         ))}
       </div>
+
+      <div className="mt-8 flex flex-wrap gap-3">
+        <a
+          href="/portal/dashboard/exportar/clientes"
+          className="rounded-lg border border-[#e7e2d6] bg-white px-4 py-2 text-sm font-medium text-[#425c5a] hover:bg-[#f7f8f8]"
+        >
+          Exportar clientes (CSV)
+        </a>
+        <a
+          href="/portal/dashboard/exportar/vendas"
+          className="rounded-lg border border-[#e7e2d6] bg-white px-4 py-2 text-sm font-medium text-[#425c5a] hover:bg-[#f7f8f8]"
+        >
+          Exportar vendas (CSV)
+        </a>
+      </div>
     </div>
   );
 }
