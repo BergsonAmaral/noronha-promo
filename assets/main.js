@@ -152,16 +152,86 @@ document.querySelectorAll(".faq-item").forEach((item) => {
   });
 });
 
-// Busca de benefícios (por enquanto apenas redireciona/filtra por categoria)
+// Busca de benefícios — carrega os benefícios ativos do Supabase e filtra
+// por categoria no cliente (o catálogo do clube é pequeno o bastante pra isso).
+const beneficiosGrid = document.getElementById("beneficios-grid");
+const beneficiosStatus = document.getElementById("beneficios-status");
+let todosBeneficios = [];
+
+function formatDesconto(b) {
+  if (!b.valor_desconto) return b.condicoes || "Benefício especial";
+  if (b.tipo_desconto === "percentual") return `${b.valor_desconto}% de desconto`;
+  if (b.tipo_desconto === "valor_fixo")
+    return `R$ ${Number(b.valor_desconto).toFixed(2).replace(".", ",")} de desconto`;
+  return b.condicoes || "Benefício especial";
+}
+
+function formatPreco(preco) {
+  return preco > 0 ? `R$ ${Number(preco).toFixed(2).replace(".", ",")}` : "Grátis";
+}
+
+function renderBeneficios(lista) {
+  if (!beneficiosGrid) return;
+
+  if (!lista.length) {
+    beneficiosGrid.innerHTML = "";
+    beneficiosStatus.textContent = "Nenhum benefício encontrado nessa categoria ainda.";
+    beneficiosStatus.className = "beneficios-status is-empty";
+    return;
+  }
+
+  beneficiosStatus.textContent = "";
+  beneficiosStatus.className = "beneficios-status";
+  beneficiosGrid.innerHTML = lista
+    .map((b) => {
+      const categoria = b.categorias;
+      const parceiro = b.parceiros;
+      return `
+        <article class="beneficio-card">
+          <span class="cat-tag"><i data-lucide="${categoria?.icone || "compass"}" data-size="14"></i> ${categoria?.nome || "Geral"}</span>
+          <h3>${b.titulo}</h3>
+          <p class="parceiro">${parceiro?.nome_negocio || "Noronha Promo"}</p>
+          <p class="desconto">${formatDesconto(b)}</p>
+          <p class="preco">${formatPreco(b.preco)}</p>
+          <a class="cta" href="/portal/login/cadastro">Criar conta para aproveitar <i data-lucide="arrow-right" data-size="14"></i></a>
+        </article>
+      `;
+    })
+    .join("");
+  renderIcons(beneficiosGrid);
+}
+
+async function carregarBeneficios() {
+  if (!beneficiosGrid) return;
+  const { data, error } = await sb
+    .from("beneficios")
+    .select("*, categorias(nome, icone, slug), parceiros(nome_negocio)")
+    .eq("status", "ativo")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    beneficiosStatus.textContent = "Não foi possível carregar os benefícios agora.";
+    beneficiosStatus.className = "beneficios-status is-error";
+    return;
+  }
+
+  todosBeneficios = data || [];
+  renderBeneficios(todosBeneficios);
+}
+
+carregarBeneficios();
+
 const formBusca = document.getElementById("form-busca");
 if (formBusca) {
   formBusca.addEventListener("submit", (e) => {
     e.preventDefault();
     const categoria = document.getElementById("categoria").value;
-    // TODO(supabase): substituir por consulta real, ex:
-    // const { data } = await sb.from('beneficios').select('*').eq('categoria', categoria)
-    window.location.hash = "beneficios";
-    console.info("Buscando benefícios da categoria:", categoria);
+    const filtrados =
+      categoria === "todas"
+        ? todosBeneficios
+        : todosBeneficios.filter((b) => b.categorias?.slug === categoria);
+    renderBeneficios(filtrados);
+    document.getElementById("beneficios").scrollIntoView({ behavior: "smooth" });
   });
 }
 

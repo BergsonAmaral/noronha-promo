@@ -435,6 +435,33 @@ a, button { -webkit-tap-highlight-color: transparent; }
   background: #fff; color: var(--text); font-family: var(--font-body);
 }
 
+/* Benefícios (grid real, vindo do Supabase) */
+.beneficios-wrap { max-width: 1040px; margin: 48px auto 0; }
+.beneficios-grid {
+  display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  text-align: left;
+}
+.beneficio-card {
+  background: #fff; border-radius: var(--radius); padding: 22px;
+  display: flex; flex-direction: column; gap: 8px; color: var(--text);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.beneficio-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px -18px rgba(0,0,0,.35); }
+.beneficio-card .cat-tag {
+  display: inline-flex; align-items: center; gap: 6px; font-size: .72rem; font-weight: 700;
+  letter-spacing: .03em; text-transform: uppercase; color: var(--gold-dark);
+}
+.beneficio-card h3 { font-size: 1.02rem; margin: 0; line-height: 1.3; }
+.beneficio-card .parceiro { font-size: .85rem; color: var(--muted); margin: 0; }
+.beneficio-card .desconto { font-weight: 700; color: var(--teal); font-size: .92rem; }
+.beneficio-card .preco { font-size: .82rem; color: var(--muted); }
+.beneficio-card .cta {
+  margin-top: 8px; font-size: .85rem; font-weight: 600; color: var(--gold-dark);
+  display: inline-flex; align-items: center; gap: 4px; text-decoration: none;
+}
+.beneficios-status { color: #cfe0e0; margin-top: 20px; text-align: center; }
+.beneficios-status.is-empty, .beneficios-status.is-error { color: #cfe0e0; }
+
 /* Categorias */
 .categorias-grid { display: grid; gap: 20px; grid-template-columns: repeat(2, 1fr); }
 @media (min-width: 800px) { .categorias-grid { grid-template-columns: repeat(3, 1fr); } }
