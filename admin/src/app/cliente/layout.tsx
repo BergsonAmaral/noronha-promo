@@ -27,6 +27,13 @@ export default async function ClienteLayout({
 
   if (!profile) redirect("/login");
 
+  const { count: mensagensNaoLidas } = await supabase
+    .from("mensagens")
+    .select("id", { count: "exact", head: true })
+    .eq("cliente_id", user.id)
+    .eq("remetente_role", "admin")
+    .eq("lida", false);
+
   // Admin também pode espiar o portal do cliente; qualquer papel
   // válido chega até aqui pois este é o destino padrão (fallback).
   return (
@@ -54,7 +61,7 @@ export default async function ClienteLayout({
           </button>
         </form>
       </header>
-      <NavTabs />
+      <NavTabs mensagensNaoLidas={mensagensNaoLidas ?? 0} />
       <main className="mx-auto max-w-md p-5">{children}</main>
     </div>
   );

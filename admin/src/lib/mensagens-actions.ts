@@ -4,19 +4,29 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import type { Mensagem } from "@/lib/supabase/types";
 
-export async function listarMensagens(parceiroId: string): Promise<Mensagem[]> {
+export type ThreadFiltro = { parceiro_id: string } | { cliente_id: string };
+
+function aplicarFiltro<T extends { eq: (col: string, val: string) => T }>(
+  query: T,
+  filtro: ThreadFiltro
+): T {
+  return "parceiro_id" in filtro
+    ? query.eq("parceiro_id", filtro.parceiro_id)
+    : query.eq("cliente_id", filtro.cliente_id);
+}
+
+export async function listarMensagens(filtro: ThreadFiltro): Promise<Mensagem[]> {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("mensagens")
-    .select("*")
-    .eq("parceiro_id", parceiroId)
-    .order("created_at", { ascending: true })
-    .returns<Mensagem[]>();
+  const query = aplicarFiltro(
+    supabase.from("mensagens").select("*").order("created_at", { ascending: true }),
+    filtro
+  );
+  const { data } = await query.returns<Mensagem[]>();
   return data ?? [];
 }
 
 export async function enviarMensagem(
-  parceiroId: string,
+  filtro: ThreadFiltro,
   texto: string
 ): Promise<{ error: string | null }> {
   const mensagem = texto.trim();
@@ -36,7 +46,9 @@ export async function enviarMensagem(
   if (!profile) return { error: "Perfil não encontrado." };
 
   const { error } = await supabase.from("mensagens").insert({
-    parceiro_id: parceiroId,
+    ...("parceiro_id" in filtro
+      ? { parceiro_id: filtro.parceiro_id }
+      : { cliente_id: filtro.cliente_id }),
     remetente_id: user.id,
     remetente_role: profile.role,
     mensagem,
@@ -44,14 +56,26 @@ export async function enviarMensagem(
 
   if (error) return { error: error.message };
 
-  revalidatePath(
-    profile.role === "admin" ? `/dashboard/mensagens/${parceiroId}` : "/parceiro/mensagens"
-  );
-  revalidatePath("/dashboard/mensagens");
+  if ("parceiro_id" in filtro) {
+    revalidatePath(
+      profile.role === "admin"
+        ? `/dashboard/mensagens/${filtro.parceiro_id}`
+        : "/parceiro/mensagens"
+    );
+    revalidatePath("/dashboard/mensagens");
+  } else {
+    revalidatePath(
+      profile.role === "admin"
+        ? `/dashboard/mensagens-clientes/${filtro.cliente_id}`
+        : "/cliente/mensagens"
+    );
+    revalidatePath("/dashboard/mensagens-clientes");
+  }
+
   return { error: null };
 }
 
-export async function marcarComoLida(parceiroId: string): Promise<void> {
+export async function marcarComoLida(filtro: ThreadFiltro): Promise<void> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -65,10 +89,13 @@ export async function marcarComoLida(parceiroId: string): Promise<void> {
     .single();
   if (!profile) return;
 
-  await supabase
-    .from("mensagens")
-    .update({ lida: true })
-    .eq("parceiro_id", parceiroId)
-    .neq("remetente_role", profile.role)
-    .eq("lida", false);
+  const query = aplicarFiltro(
+    supabase
+      .from("mensagens")
+      .update({ lida: true })
+      .neq("remetente_role", profile.role)
+      .eq("lida", false),
+    filtro
+  );
+  await query;
 }

@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { listarMensagens, enviarMensagem, marcarComoLida } from "@/lib/mensagens-actions";
+import {
+  listarMensagens,
+  enviarMensagem,
+  marcarComoLida,
+  type ThreadFiltro,
+} from "@/lib/mensagens-actions";
 import type { Mensagem, UserRole } from "@/lib/supabase/types";
 import { Send } from "lucide-react";
 
@@ -15,12 +20,12 @@ function formatHora(iso: string) {
 }
 
 export function ChatThread({
-  parceiroId,
+  filtro,
   meRole,
   counterpartLabel,
   initialMensagens,
 }: {
-  parceiroId: string;
+  filtro: ThreadFiltro;
   meRole: UserRole;
   counterpartLabel: string;
   initialMensagens: Mensagem[];
@@ -29,18 +34,21 @@ export function ChatThread({
   const [texto, setTexto] = useState("");
   const [isPending, startTransition] = useTransition();
   const bottomRef = useRef<HTMLDivElement>(null);
+  const filtroKey = "parceiro_id" in filtro ? filtro.parceiro_id : filtro.cliente_id;
 
   useEffect(() => {
-    marcarComoLida(parceiroId);
-  }, [parceiroId]);
+    marcarComoLida(filtro);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtroKey]);
 
   useEffect(() => {
     const interval = setInterval(async () => {
-      const atual = await listarMensagens(parceiroId);
+      const atual = await listarMensagens(filtro);
       setMensagens(atual);
     }, 4000);
     return () => clearInterval(interval);
-  }, [parceiroId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtroKey]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -52,8 +60,8 @@ export function ChatThread({
     if (!texto2) return;
     setTexto("");
     startTransition(async () => {
-      await enviarMensagem(parceiroId, texto2);
-      const atual = await listarMensagens(parceiroId);
+      await enviarMensagem(filtro, texto2);
+      const atual = await listarMensagens(filtro);
       setMensagens(atual);
     });
   }

@@ -1,9 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Mensagem, Parceiro } from "@/lib/supabase/types";
+import type { Mensagem, Profile } from "@/lib/supabase/types";
 import Link from "next/link";
-import { MessageCircle, Store } from "lucide-react";
-
-type ParceiroComChat = Pick<Parceiro, "id" | "nome_negocio"> & { user_id: string | null };
+import { MessageCircle, UserRound } from "lucide-react";
 
 function formatData(iso: string) {
   return new Date(iso).toLocaleString("pt-BR", {
@@ -14,74 +12,67 @@ function formatData(iso: string) {
   });
 }
 
-export default async function MensagensInboxPage() {
+export default async function MensagensClientesInboxPage() {
   const supabase = await createClient();
 
-  const [{ data: parceiros }, { data: mensagens }] = await Promise.all([
-    supabase
-      .from("parceiros")
-      .select("id, nome_negocio, user_id")
-      .not("user_id", "is", null)
-      .order("nome_negocio")
-      .returns<ParceiroComChat[]>(),
-    supabase
-      .from("mensagens")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .returns<Mensagem[]>(),
-  ]);
+  const { data: mensagens } = await supabase
+    .from("mensagens")
+    .select("*")
+    .not("cliente_id", "is", null)
+    .order("created_at", { ascending: false })
+    .returns<Mensagem[]>();
 
-  const conversas = (parceiros ?? []).map((p) => {
-    const doParceiro = (mensagens ?? []).filter((m) => m.parceiro_id === p.id);
-    const ultima = doParceiro[0] ?? null;
-    const naoLidas = doParceiro.filter(
-      (m) => m.remetente_role === "parceiro" && !m.lida
-    ).length;
-    return { parceiro: p, ultima, naoLidas };
+  const clienteIds = Array.from(new Set((mensagens ?? []).map((m) => m.cliente_id!)));
+
+  const { data: clientes } = clienteIds.length
+    ? await supabase
+        .from("profiles")
+        .select("*")
+        .in("id", clienteIds)
+        .returns<Profile[]>()
+    : { data: [] as Profile[] };
+
+  const conversas = (clientes ?? []).map((c) => {
+    const doCliente = (mensagens ?? []).filter((m) => m.cliente_id === c.id);
+    const ultima = doCliente[0] ?? null;
+    const naoLidas = doCliente.filter((m) => m.remetente_role === "cliente" && !m.lida).length;
+    return { cliente: c, ultima, naoLidas };
   });
 
   conversas.sort((a, b) => {
-    if (!a.ultima && !b.ultima) return 0;
-    if (!a.ultima) return 1;
-    if (!b.ultima) return -1;
-    return (
-      new Date(b.ultima.created_at).getTime() - new Date(a.ultima.created_at).getTime()
-    );
+    if (!a.ultima || !b.ultima) return 0;
+    return new Date(b.ultima.created_at).getTime() - new Date(a.ultima.created_at).getTime();
   });
 
   return (
     <div>
       <h1 className="font-head text-2xl font-bold text-[#263f40]">Mensagens</h1>
-      <p className="mt-1 text-sm text-[#5c6e6f]">
-        Converse com os parceiros que já têm login no clube.
-      </p>
+      <p className="mt-1 text-sm text-[#5c6e6f]">Converse com os clientes do clube.</p>
 
       <div className="mt-4 mb-6 flex gap-2 text-sm">
-        <span className="rounded-lg bg-[#263f40] px-3 py-1.5 font-medium text-white">
-          Parceiros
-        </span>
         <Link
-          href="/dashboard/mensagens-clientes"
+          href="/dashboard/mensagens"
           className="rounded-lg border border-[#e7e2d6] px-3 py-1.5 font-medium text-[#425c5a] hover:bg-[#f7f8f8]"
         >
-          Clientes
+          Parceiros
         </Link>
+        <span className="rounded-lg bg-[#263f40] px-3 py-1.5 font-medium text-white">
+          Clientes
+        </span>
       </div>
 
       <div className="grid gap-3">
-        {conversas.map(({ parceiro, ultima, naoLidas }) => (
+        {conversas.map(({ cliente, ultima, naoLidas }) => (
           <Link
-            key={parceiro.id}
-            href={`/dashboard/mensagens/${parceiro.id}`}
+            key={cliente.id}
+            href={`/dashboard/mensagens-clientes/${cliente.id}`}
             className="flex items-center gap-4 rounded-xl border border-[#e7e2d6] bg-white p-4 transition hover:border-[#48696c]"
           >
             <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#eef4f2] text-[#48696c]">
-              <Store size={18} strokeWidth={2} />
+              <UserRound size={18} strokeWidth={2} />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="font-head text-sm font-semibold text-[#263f40]">
-                {parceiro.nome_negocio}
-              </p>
+              <p className="font-head text-sm font-semibold text-[#263f40]">{cliente.nome}</p>
               <p className="truncate text-sm text-[#5c6e6f]">
                 {ultima ? ultima.mensagem : "Nenhuma mensagem ainda"}
               </p>
@@ -102,7 +93,7 @@ export default async function MensagensInboxPage() {
         {!conversas.length && (
           <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-[#e7e2d6] bg-white p-8 text-center text-[#5c6e6f]">
             <MessageCircle size={22} strokeWidth={2} className="text-[#9db1b1]" />
-            Nenhum parceiro com login criado ainda.
+            Nenhum cliente iniciou conversa ainda.
           </div>
         )}
       </div>

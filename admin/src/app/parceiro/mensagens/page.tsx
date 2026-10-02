@@ -28,11 +28,11 @@ export default async function MensagensParceiroPage() {
     );
   }
 
-  const mensagens = await listarMensagens(parceiro.id);
+  const mensagens = await listarMensagens({ parceiro_id: parceiro.id });
 
   return (
     <ChatThread
-      parceiroId={parceiro.id}
+      filtro={{ parceiro_id: parceiro.id }}
       meRole="parceiro"
       counterpartLabel="Suporte Noronha Promo"
       initialMensagens={mensagens}

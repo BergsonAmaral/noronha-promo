@@ -80,7 +80,8 @@ export interface Resgate {
 
 export interface Mensagem {
   id: string;
-  parceiro_id: string;
+  parceiro_id: string | null;
+  cliente_id: string | null;
   remetente_id: string;
   remetente_role: UserRole;
   mensagem: string;
