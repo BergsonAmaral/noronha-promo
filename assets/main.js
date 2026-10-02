@@ -219,21 +219,38 @@ async function carregarBeneficios() {
   renderBeneficios(todosBeneficios);
 }
 
-carregarBeneficios();
+const beneficiosCarregados = carregarBeneficios();
+
+function filtrarEMostrar(categoria) {
+  const filtrados =
+    !categoria || categoria === "todas"
+      ? todosBeneficios
+      : todosBeneficios.filter((b) => b.categorias?.slug === categoria);
+  renderBeneficios(filtrados);
+  document.getElementById("beneficios").scrollIntoView({ behavior: "smooth" });
+}
 
 const formBusca = document.getElementById("form-busca");
 if (formBusca) {
   formBusca.addEventListener("submit", (e) => {
     e.preventDefault();
-    const categoria = document.getElementById("categoria").value;
-    const filtrados =
-      categoria === "todas"
-        ? todosBeneficios
-        : todosBeneficios.filter((b) => b.categorias?.slug === categoria);
-    renderBeneficios(filtrados);
-    document.getElementById("beneficios").scrollIntoView({ behavior: "smooth" });
+    filtrarEMostrar(document.getElementById("categoria").value);
   });
 }
+
+// Cards de destaque ("Descubra novos caminhos" etc.) levam direto para os
+// cupons já filtrados pela categoria daquele card, em vez de mostrar tudo.
+document.querySelectorAll("[data-categoria]").forEach((el) => {
+  el.addEventListener("click", async (e) => {
+    const categoria = el.getAttribute("data-categoria");
+    if (!categoria) return;
+    e.preventDefault();
+    await beneficiosCarregados;
+    const select = document.getElementById("categoria");
+    if (select) select.value = categoria;
+    filtrarEMostrar(categoria);
+  });
+});
 
 // Lista de interesse (captura de leads)
 const formLista = document.getElementById("form-lista");
